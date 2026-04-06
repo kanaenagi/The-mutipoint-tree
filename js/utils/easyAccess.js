@@ -91,3 +91,5 @@ const hm = hasMilestone
 const hu = hasUpgrade
 
 const ha = hasAchievement
+
+const ue = upgradeEffect

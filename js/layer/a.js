@@ -1,4 +1,5 @@
 "use strict";
+/* v0.2前瞻
 addLayer("a", {
     name: "aprestige",
     symbol: "A",
@@ -226,3 +227,4 @@ addLayer("a", {
     },
     layerShown() { return (hasChallenge("e", 22) || player.a.total.gte(1) || ha("ach", 36)) },
 }) 
+*/

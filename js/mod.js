@@ -3,18 +3,22 @@ let modInfo = {
 	id: "mutipointree",
 	author: "kanaenagi",
 	pointsName: "点数",
-	modFiles: ["tree.js", "layer/p.js", "layer/e.js", "layer/c.js", "layer/a.js", "layer/t.js", "layer/side.js"],
+	modFiles: ["tree.js", "layer/p.js", "layer/e.js", "layer/c.js", "layer/a.js", "layer/side.js"],
 	discordName: "",
 	discordLink: "",
 	initialStartPoints: new Decimal(0), // Used for hard resets and new players
 	offlineLimit: 900,  // In second
 }
 let VERSION = {
-	num: "0.1",
-	name: "开始",
+	num: "0.1.1",
+	name: "打破膨胀",
 }
 
 let changelog = `<h1>更新日志:</h1><br>
+	<h3>V0.1.1</h3><br>
+	- 添加了PM<br>
+	- 残局：1e3250点数<br>
+	- 成就数量：12<br>
     <h3>V0.1</h3><br>
 	- 添加了3个层级<br>
 	- 残局：1e1700点数<br>
@@ -75,7 +79,7 @@ function addedPlayerData() {
 
 var displayThings = [
 	function () {
-		let a = "残局:1.000e1680点数"
+		let a = "残局:1.000e3250点数"
 		//a += "<br>由于你的点数超过了1e10,000  点数获取速度受到软上限限制<br>由于你的点数超过了1e1,000,000  点数获取速度受到二重软上限限制<br>由于你的点数超过了e1e13  点数获取速度受到三重软上限限制<br>由于你的点数超过了e1e19  点数获取速度受到四重软上限限制<br>由于你的点数超过了e1e30  点数获取速度受到溢出<br>由于你的点数超过了e1e100  点数获取速度受到二重溢出<br>由于你的点数超过了e1e1,000  点数获取速度受到三重溢出<br0>由于你的点数超过了e1e10,000  点数获取速度受到四重溢出<br>由于你的点数超过了eee12  点数获取速度受到淤积<br>由于你的点数超过了ee1e100  点数获取速度受到二重淤积<br>由于你的点数超过了1.000F5  点数获取速度受到三重淤积<br>由于你的点数超过了1.000F7  点数获取速度受到四重淤积<br>由于你的点数超过了1.000F10  点数获取速度受到扭曲<br>由于你的点数超过了1.000F1,000  点数获取速度受到二重扭曲<br>由于你的点数超过了1.000F10,000,000 点数获取速度受到三重扭曲<br>由于你的点数超过了F1.000e13  点数获取速度受到四重扭曲<br>由于你的点数超过了F1.000e308  点数获取速度受到故障"//"<br>由于你的点数超过了Fe1.000e18  点数获取速度受到二重故障<br>由于你的点数超过了F1.000F5 点数获取速度受到三重故障<br>由于你的点数超过了1.000G5  点数获取速度受到四重故障<br>由于你的点数超过了1.000J10  点数获取速度受到蒸发"
 		return a
 	}
@@ -83,7 +87,7 @@ var displayThings = [
 ]
 
 function isEndgame() {
-	return player.points.gte("1e1680")
+	return player.points.gte("1e3250")
 }
 
 var backgroundStyle = {

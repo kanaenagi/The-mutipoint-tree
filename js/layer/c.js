@@ -68,8 +68,9 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
     },
     dpointgain() {
         let gain = expPow(player.c.dbpoint.div(1e47).max(1).log(10).pow(3), 1.4)
-        if (hu("c", 25)) gain = gain.pow(player.c.dbpoint.max(10).log(10).add(9).max(10).log(10).pow(0.75))
+        //if (hu("c", 25)) gain = gain.pow(player.c.dbpoint.max(10).log(10).add(9).max(10).log(10).pow(0.75))
         if (player.c.dbpoint.lt(1e48)) return n(0)
+        if (hu("p", 43)) gain = gain.mul(ue('p', 43))
         gain = gain.mul(tmp.c.buyables[11].effect)
         if (hu("c", 34)) gain = gain.mul(125)
         if (hu("c", 44)) gain = gain.mul(10)
@@ -123,7 +124,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 'resource-display',
                 ["blank", "25px"],
                 ["display-text", function () { let a = " (开始于1e48)"; return "点数膨胀的最佳点数为 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.dbpoint) + "</h3> <br><br>你有 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.dp) + "</h3> 膨胀点数 点数^<h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(tmp.c.dpeff) + "</h3><br>你每秒获取" + format(tmp.c.dpointgain) + "膨胀点数" + a }],
-                ["display-text", function () { if (hu("c", 41)) return "你有 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.ds) + "</h3> 膨胀碎片 膨胀点数*<h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(tmp.c.dseff) + "</h3> <br>(下一个在 " + format(tmp.c.dsnext) + " 点数膨胀内点数) " }],
+                ["display-text", function () { if (hu("c", 24)) return "你有 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.ds) + "</h3> 膨胀碎片 膨胀点数*<h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(tmp.c.dseff) + "</h3> <br>(下一个在 " + format(tmp.c.dsnext) + " 点数膨胀内点数) " }],
                 ["clickables", [1]],
                 ["row", [["buyable", 11], ["buyable", 12], ["buyable", 13]]],
                 ["row", [["buyable", 21], ["buyable", 22], ["buyable", 23]]],
@@ -134,7 +135,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         if (player.points.gte(player.c.dbpoint) && getClickableState("c", 11) == 1) player.c.dbpoint = player.points
         if (hu("a", 13)) player.c.dbpoint = expPow(player.points,getpointdileff()).pow(1.25).max(player.c.dbpoint)
         if (hu("c", 15)) player.c.dp = player.c.dp.add(tmp.c.dpointgain.mul(diff))
-        if (hu("c", 41)) player.c.ds = player.c.ds.add(tmp.c.dsgain).max(player.c.ds)
+        if (hu("c", 24)) player.c.ds = player.c.ds.add(tmp.c.dsgain).max(player.c.ds)
         if (player.a.dpat) { layers.c.buyables[11].buyMax(); layers.c.buyables[12].buyMax(); layers.c.buyables[13].buyMax(); layers.c.buyables[21].buyMax(); layers.c.buyables[22].buyMax(); layers.c.buyables[23].buyMax() }
     },
     upgrades: {
@@ -148,7 +149,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         },
         12: {
             title: "C2",
-            description: "E7效果变得更好",
+            description: "E7效果变得更好, P3指数^1.1",
             cost: n(3),
             unlocked() { return hu("c", 11) },
         },
@@ -158,7 +159,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             currencyDisplayName: "点数",
             currencyInternalName: "points",
             effect() {
-                let base = player.c.points.anti_softcap(3, 2, 1)
+                let base = player.c.points.anti_softcap(3, 2, 1).anti_softcap(10, 2, 1)
                 let eff = Decimal.pow(4, base)
                 return eff
             },
@@ -194,42 +195,48 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         },
         21: {
             title: "C6",
-            description: "对数领域奖励指数^1.25 解锁新的增强点数挑战",
+            description: "对数领域奖励指数^1.25",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("1e969"),
-            unlocked() { return hu("c", 150) },
+            cost: n("1e1931"),
+            unlocked() { return hu("c", 15) },
         },
         22: {
             title: "C7",
             description: "膨胀点数效果变得更好",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("1e1017"),
+            cost: n("1e2440"),
             unlocked() { return hu("c", 21) },
         },
         23: {
             title: "C8",
-            description: "P4^1.1",
+            description: "膨胀点数加成PN",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("1e1130"),
+            cost: n("1e2670"),
+            effect() {
+                let base = player.c.points.anti_softcap(8, 2, 1)
+                let eff = Decimal.pow(2, base)
+                return eff
+            },
+            effectDisplay() { return "*" + format(upgradeEffect('c', 23)) },
             unlocked() { return hu("c", 22) },
         },
         24: {
             title: "C9",
-            description: "'对数领域'可以完成10次",
+            description: "在点数膨胀中解锁膨胀碎片, 获取一个免费的声望力量购买项'力量增幅'",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("1e1195"),
+            cost: n("e2810"),
             unlocked() { return hu("c", 23) },
         },
         25: {
             title: "C10",
-            description: "膨胀点数公式变得更好",
+            description: "解锁奇点(还没做)",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("1e1224"),
+            cost: n("1e3250"),
             unlocked() { return hu("c", 24) },
         },
         31: {
@@ -240,7 +247,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             effect() { return expPow(player.c.dbpoint.div(1e73).max(10).log(10).pow(2), 1.75) },
             effectDisplay() { return "*" + format(upgradeEffect('c', 31)) },
             cost: n("1e1310"),
-            unlocked() { return hu("c", 25) },
+            unlocked() { return hu("c", 250) },
         },
         32: {
             title: "C12",
@@ -276,7 +283,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         },
         41: {
             title: "C16",
-            description: "你可以在点数膨胀中获取膨胀碎片",
+            description: "",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
             cost: n("1e1569"),

@@ -100,6 +100,20 @@ addLayer("ach", {
                 return hu('c', 15)
             },
         },
+        25: {
+            name: "并非note",
+            tooltip: "解锁PN",
+            done() {
+                return hm('e', 11)
+            },
+        },
+        26: {
+            name: "奇点, 第二行的结束",
+            tooltip: "解锁奇点",
+            done() {
+                return hu('c', 25)
+            },
+        },
     },
     layerShown() { return true },
 })
