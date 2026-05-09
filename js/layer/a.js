@@ -1,5 +1,5 @@
 "use strict";
-/* v0.2前瞻
+// v0.2前瞻
 addLayer("a", {
     name: "aprestige",
     symbol: "A",
@@ -147,7 +147,7 @@ addLayer("a", {
     milestones: {
         0: {
             requirementDescription: "1 反-点数 (1)",
-            effectDescription: "自动购买PM-B-1,2,3,4,5,6 保留增强点数里程碑1,2,3,4,9 点数*100 压缩点数效果变得更好",
+            effectDescription: "自动购买E-PM-1,2,3,4,5,6 保留增强点数里程碑1,2,3,4,9 点数*100 压缩点数效果变得更好",
             done() { return player.a.points.gte(1) },
             toggles: [["a", "pmat1"]],
         },
@@ -226,5 +226,4 @@ addLayer("a", {
         },
     },
     layerShown() { return (hasChallenge("e", 22) || player.a.total.gte(1) || ha("ach", 36)) },
-}) 
-*/
+})
