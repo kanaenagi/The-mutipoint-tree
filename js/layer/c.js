@@ -67,9 +67,8 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         return mult
     },
     dpointgain() {
-        let gain = expPow(player.c.dbpoint.div(1e47).max(1).log(10).pow(3), 1.4)
-        //if (hu("c", 25)) gain = gain.pow(player.c.dbpoint.max(10).log(10).add(9).max(10).log(10).pow(0.75))
         if (player.c.dbpoint.lt(1e48)) return n(0)
+        let gain = expPow(player.c.dbpoint.div(1e47).max(1).log(10).pow(3), 1.4)
         if (hu("p", 43)) gain = gain.mul(ue('p', 43))
         gain = gain.mul(tmp.c.buyables[11].effect)
         if (hu("c", 34)) gain = gain.mul(125)
@@ -86,14 +85,16 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         return eff
     },
     dsgain() {
-        let gain = player.c.dbpoint.div("1e104").max(1).log(1e20).pow(0.6).softcap(n(100),1.01,3)
+        let gain = player.c.dbpoint.div("1e104").max(1).log(1e20).pow(0.8).softcap(n(100), 1.01, 3)
         return gain.sub(player.c.ds).floor()
     },
     dsnext() {
-        let amt = player.c.ds.add(tmp.c.dsgain.max(0).add(1)).anti_softcap(n(100),1.01,3)
+        let amt = player.c.ds.add(tmp.c.dsgain.max(0).add(1)).anti_softcap(n(100), 1.01, 3)
+        let next = Decimal.pow(1e20, amt.root(0.8)).mul("1e104")
         return next
     },
     dseff() {
+        let eff = Decimal.pow(100, player.c.ds)
         return eff
     },
     hotkeys: [
