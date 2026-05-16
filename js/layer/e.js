@@ -338,7 +338,7 @@ addLayer("e", {
         35: {
             title: "E15",
             description: "膨胀点数加成PM",
-            cost: n(4.85e70),
+            cost: n(1e120),
             effect() {
                 let eff = expPow(player.c.dp.max(1), 0.8).pow(0.5).mul(2)
                 return eff

@@ -91,11 +91,9 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
     },
     dsnext() {
         let amt = player.c.ds.add(tmp.c.dsgain.max(0).add(1)).anti_softcap(n(100),1.01,3)
-        let next = Decimal.pow(1e20, amt.root(0.6)).mul("1e104")
         return next
     },
     dseff() {
-        let eff = Decimal.pow(100, player.c.ds.pow(1.25))
         return eff
     },
     hotkeys: [

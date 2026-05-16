@@ -45,7 +45,7 @@ addLayer("ach", {
             },
         },
         13: {
-            name: "这是刷PP的游戏?",
+            name: "声望增幅",
             tooltip: "解锁声望力量",
             done() {
                 return hm("p",0)
@@ -104,11 +104,11 @@ addLayer("ach", {
             name: "并非note",
             tooltip: "解锁PN",
             done() {
-                return hm('e', 11)
+                return hm('e', 10)
             },
         },
         26: {
-            name: "奇点, 第二行的结束",
+            name: "奇点, 第二行的结束...?",
             tooltip: "解锁奇点",
             done() {
                 return hu('c', 25)
