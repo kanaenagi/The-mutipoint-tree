@@ -17,7 +17,7 @@ let VERSION = {
 let changelog = `<h1>更新日志:</h1><br>
 	<h3>V0.1.2</h3><br>
 	- 添加了奇点<br>
-	- 残局：1e6500点数<br>
+	- 残局：1e6400点数<br>
 	- 成就数量：15<br>
 	<h3>V0.1.1</h3><br>
 	- 添加了PN<br>
