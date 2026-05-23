@@ -23,7 +23,7 @@ addLayer("a", {
         }
     },
     color: "#e34f9e",
-    requires: n("1e213"),
+    requires: n("1e5000"),
     resource: "反-点数",
     baseResource: "增强点数",
     branches: ["e", "c"],
@@ -64,12 +64,12 @@ addLayer("a", {
         return exp
     },
     getResetGain() {
-        if (player.e.points.lt("1e213")) return n(0)
-        let gain = player.e.points.div("1e213").max(1).pow(tmp.a.exponent).mul(tmp.a.gainMult).pow(tmp.a.gainExp)
+        if (player.e.points.lt("1e5000")) return n(0)
+        let gain = player.e.points.div("1e500").max(1).pow(tmp.a.exponent).mul(tmp.a.gainMult).pow(tmp.a.gainExp)
         return gain.floor()
     },
     getNextAt() {
-        let next = tmp.a.getResetGain.add(1).root(tmp.a.gainExp).div(tmp.a.gainMult).root(tmp.a.exponent).mul("e213").max("e213")
+        let next = tmp.a.getResetGain.add(1).root(tmp.a.gainExp).div(tmp.a.gainMult).root(tmp.a.exponent).mul("e500").max("e5000")
         return next
     },
     update(diff) {
@@ -77,7 +77,7 @@ addLayer("a", {
     hotkeys: [
         {
             key: "a", description: "A:重置以获取反-点数",
-            unlocked() { return (hasChallenge("e", 22) || player.a.total.gte(1) || ha("ach", 14)) },
+            unlocked() { return (player.e.challenges[22] >= 5 || player.a.total.gte(1) || ha("ach", 34)) },
             onPress() { if (canReset(this.layer)) doReset(this.layer) }
         },
     ],
@@ -94,7 +94,7 @@ addLayer("a", {
             ],
         },
         "Milestones": {
-            unlocked() { return true },
+            unlocked() { return false },
             name: "里程碑",
             content: ["main-display",
                 "prestige-button",
@@ -117,7 +117,7 @@ addLayer("a", {
     upgrades: {
         11: {
             title: "A1",
-            description: "点数膨胀不再削弱声望点数和声望力量 但无效化C12和C19",
+            description: "",
             cost: n(25),
             unlocked() { return true },
         },
@@ -225,5 +225,5 @@ addLayer("a", {
             marked() {return false},
         },
     },
-    layerShown() { return (hasChallenge("e", 22) || player.a.total.gte(1) || ha("ach", 36)) },
+    layerShown() { return ( player.e.challenges[22] >= 5 || player.a.total.gte(1) || ha("ach", 34)) },
 })

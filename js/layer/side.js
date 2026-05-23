@@ -73,10 +73,10 @@ addLayer("ach", {
             },
         },
         21: {
-            name: "扩展更新",
-            tooltip: "购买P11",
+            name: "压缩层级",
+            tooltip: "获取1压缩点数",
             done() {
-                return hu('p', 31)
+                return player.c.points.gte(1)
             },
         },
         22: {
@@ -114,6 +114,27 @@ addLayer("ach", {
                 return hu('c', 25)
             },
         },
+        31: {
+            name: "无限增强",
+            tooltip: "获取1.797e308增强点数",
+            done() {
+                return player.e.points.gte('1.797e308')
+            },
+        },
+        32: {
+            name: "1组压缩点数",
+            tooltip: "获取16压缩点数<br>这个堆叠上限只有16",
+            done() {
+                return player.c.points.gte(16)
+            },
+        },
+        33: {
+            name: "进入第三行",
+            tooltip: "完成三次撕裂膨胀",
+            done() {
+                return player.e.challenges[22] >= 3
+            },
+        },
     },
     layerShown() { return true },
 })
@@ -130,7 +151,7 @@ addLayer("T", {  //喜欢不内置vue的小朋友们叉出去
     },
     color: "#FFFFFFF",
     resource: "",
-    baseResource: "声望力量",
+    baseResource: "",
     tooltip: "测试",
     baseAmount() { return player.points },
     row: "side",

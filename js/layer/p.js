@@ -46,6 +46,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
   },
   gainExp() {
     let exp = n(1)
+    exp = exp.mul(tmp.c.buyables[102].effect)
     return exp
   },
   getResetGain() {
@@ -274,7 +275,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     },
     32: {
       title: "P12",
-      description: "'力量加成'加成PM效果",
+      description: "'P-PP-1'加成PM效果",
       cost: n('1e1725'),
       effect() {
         return player.p.buyables[113].mul(0.0125).add(1)
@@ -316,7 +317,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     },
     41: {
       title: "P16",
-      description: "基于声望力量加成PN",
+      description: "基于声望力量增强PN",
       cost: n("1e4080"),
       effect() {
         let eff = expPow(player.p.pp.add(10).max(10).log(10), 2)
@@ -582,7 +583,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
         if (hu("e", 14)) base = base.mul(tmp.e.upgrades[14].effect)
         return base
       },
-      title() { return "力量加成" },
+      title() { return "P-PP-1" },
       effect() {
         let x = getBuyableAmount("p", 111)
         let base = tmp.p.buyables[111].base
@@ -625,7 +626,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
         if (hu("c", 54)) base = base.mul(tmp.c.upgrades[54].effect)
         return base
       },
-      title() { return "力量指数" },
+      title() { return "P-PP-2" },
       effect() {
         let x = getBuyableAmount("p", 112)
         let base = tmp.p.buyables[112].base
@@ -675,7 +676,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
         let base = n(1.1)
         return base
       },
-      title() { return "力量增幅" },
+      title() { return "P-PP-3" },
       effect() {
         let x = getBuyableAmount("p", 113).add(tmp.p.buyables[this.id].bonus)
         let base = tmp.p.buyables[113].base

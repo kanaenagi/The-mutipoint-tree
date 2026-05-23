@@ -31,7 +31,7 @@ addLayer("e", {
         if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
         if (hm("a", 0) && !hm("a", 2)) player.e.milestones.push("0", "1", "2", "3", "8")
     },
-    autoUpgrade() { return player.a.ateu },
+    autoUpgrade() { return false },
     exponent() {
         let exp = 0.08
         return exp
@@ -75,13 +75,13 @@ addLayer("e", {
     getResetGain() {
         if (player.p.pp.lt(tmp.e.requires)) return n(0)
         let gain = player.p.pp.div(tmp.e.requires).max(1).pow(tmp.e.exponent).mul(tmp.e.gainMult).pow(tmp.e.gainExp)
-        if (getClickableState("c", 11) == 1 && !hu("c", 33)) return expPow(gain, getpointdileff())
+        if (getClickableState("c", 11) == 1 ) return expPow(gain, getpointdileff())
         return gain.floor()
     },
     getNextAt() {
         let next = tmp.e.getResetGain.add(1).root(tmp.e.gainExp).div(tmp.e.gainMult).root(tmp.e.exponent).mul(tmp.e.requires).max(tmp.e.requires)
         if (isNaN(next.mag)) return n(tmp.e.requires)
-        if (getClickableState("c", 11) == 1 && !hu("c", 33)) return expRoot(next, 0.75)
+        if (getClickableState("c", 11) == 1 ) return expRoot(next, 0.75)
         return next
     },
     pmGain() {
@@ -121,16 +121,20 @@ addLayer("e", {
         let mult = n(1)
         if (hu("c", 23)) mult = mult.mul(tmp.c.upgrades[23].effect)
         mult = mult.mul(tmp.e.buyables[31].effect)
+        mult = mult.mul(tmp.c.buyables[101].effect)
+        
         mult = mult.mul(Decimal.pow(base, bexp))
+        //mult = mult.mul(tmp.c.sing.eff)
         if (hu("c", 35)) mult = mult.mul(100)
         let exp = n(1)
-        exp = exp.mul(tmp.e.buyables[33].effect)
+        
         let gain = base.mul(mult).pow(exp)
         return gain
     },
     pneff() {
         let eff = Array.from({ length: 2 }, () => n(1))
         eff[0] = player.e.pn.add(1).pow(2)
+        eff[0] = eff[0].pow(tmp.e.buyables[33].effect)
         eff[1] = player.e.pn.add(10).max(10).log(10).pow(0.4).mul(0.1).add(0.9)
         if (hasChallenge("e", 22)) eff[0] = eff[0].add(player.e.pn.add(10).max(10).log(10).log(10).mul(0.04))
         return eff
@@ -232,7 +236,7 @@ addLayer("e", {
         },
         12: {
             title: "E2",
-            description: "'力量指数'基础效果+0.05",
+            description: "'P-PP-2'基础效果+0.05",
             cost: n(250),
             unlocked() { return hu("e", 11) },
         },
@@ -249,7 +253,7 @@ addLayer("e", {
         },
         14: {
             title: "E4",
-            description: "增强点数加成'力量加成'",
+            description: "增强点数加成'P-PP-1'",
             effect() {
                 return player.e.points.add(10).max(10).log(10).add(9).log(10).mul(1.1)
             },
@@ -265,7 +269,7 @@ addLayer("e", {
         },
         21: {
             title: "E6",
-            description: "声望力量加成PM",
+            description: "声望力量增强PM",
             effect() {
                 let eff = player.p.pp.add(10).log10()
                 return eff
@@ -331,7 +335,7 @@ addLayer("e", {
         },
         34: {
             title: "E14",
-            description: "PM-B-2,5基础效果^1.1",
+            description: "E-PM-2,5基础效果^1.1",
             cost: n(1e107),
             unlocked() { return hu("e", 33) },
         },
@@ -348,13 +352,13 @@ addLayer("e", {
         },
         41: {
             title: "E16",
-            description: "削弱PM-B-1基础价格",
+            description: "削弱E-PM-1基础价格",
             cost: n(2.15e84),
             unlocked() { return hu("e", 350) },
         },
         42: {
             title: "E17",
-            description: "PM-B-4基础效果^1.2",
+            description: "E-PM-4基础效果^1.2",
             cost: n(1e104),
             unlocked() { return hu("e", 41) },
         },
@@ -377,7 +381,7 @@ addLayer("e", {
         },
         45: {
             title: "E20",
-            description: "PM-B-1基础效果*1.25",
+            description: "E-PM-1基础效果*1.25",
             cost: n(5e179),
             unlocked() { return hu("e", 44) },
         },
@@ -389,7 +393,7 @@ addLayer("e", {
         },
         52: {
             title: "E22",
-            description: "PM-B-1基础效果*1.6",
+            description: "E-PM-1基础效果*1.6",
             cost: n(1e187),
             unlocked() { return hu("e", 51) },
         },
@@ -412,7 +416,7 @@ addLayer("e", {
         },
         55: {
             title: "E25",
-            description: "削弱PM-B-3价格 膨胀点数*1000",
+            description: "削弱E-PM-3价格 膨胀点数*1000",
             cost: n(5e208),
             unlocked() { return hu("e", 54) },
         },
@@ -467,7 +471,7 @@ addLayer("e", {
         },
         7: {
             requirementDescription: "5e55 增强点数 (8)",
-            effectDescription: "削弱PM-B-1价格",
+            effectDescription: "削弱E-PM-1价格",
             done() { return player.e.points.gte(5e55) }
         },
         8: {
@@ -520,7 +524,7 @@ addLayer("e", {
                 if (!hm("a", 0)) player.points = player.points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "PM-B-1" },
+            title() { return "E-PM-1" },
             base() {
                 let base = n(1)
                 if (hu("e", 45)) base = base.mul(1.25)
@@ -571,7 +575,7 @@ addLayer("e", {
                 if (!hm("a", 0)) player.e.points = player.e.points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "PM-B-2" },
+            title() { return "E-PM-2" },
             base() {
                 let base = player.e.pm.add(1).max(1).log(10).add(2)
                 if (hu("e", 34)) base = base.pow(1.1)
@@ -621,7 +625,7 @@ addLayer("e", {
                 if (!hm("a", 0)) player.e.pm = player.e.pm.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "PM-B-3" },
+            title() { return "E-PM-3" },
             base() {
                 let base = n(0.5)
                 return base
@@ -669,7 +673,7 @@ addLayer("e", {
                 if (!hm("a", 0)) player.e.pm = player.e.pm.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "PM-B-4" },
+            title() { return "E-PM-4" },
             base() {
                 let base = player.p.pp.add(10).max(10).log(10)
                 if (hu("e", 42)) base = base.pow(1.2)
@@ -719,7 +723,7 @@ addLayer("e", {
                 if (!hm("a", 0)) player.e.pm = player.e.pm.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "PM-B-5" },
+            title() { return "E-PM-5" },
             base() {
                 let base = player.e.pm.add(10).max(10).log(10).pow(0.5)
                 if (hu("e", 34)) base = base.pow(1.1)
@@ -735,7 +739,7 @@ addLayer("e", {
                 let s = player.e.pm
                 let exp = tmp.e.buyables[22].coste
                 let base = tmp.e.buyables[22].costbase
-                let target = s.div(base).log(20).root(exp)
+                let target = s.div(base).log(10).root(exp)
                 if (target.gte(100)) target = target.div(100).root(2).mul(100)
                 return target.floor().add(1)
             },
@@ -776,7 +780,7 @@ addLayer("e", {
                 if (!hm("a", 0)) player.e.pm = player.e.pm.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "PM-B-6" },
+            title() { return "E-PM-6" },
             base() {
                 let base = player.p.points.add(10).max(10).log(10).pow(2)
                 if (hu("a", 33)) base = base.pow(5)
@@ -827,7 +831,7 @@ addLayer("e", {
                 if (!hm("a", 2)) player.e.pn = player.e.pn.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "PN-B-1" },
+            title() { return "E-PN-1" },
             base() {
                 let base = player.e.pn.add(10).max(10).log(10).add(1).softcap(10, 0.5)
                 return base
@@ -876,10 +880,11 @@ addLayer("e", {
                 if (!hm("a", 2)) player.e.pn = player.e.pn.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "PN-B-2" },
+            title() { return "E-PN-2" },
             base() {
-                let base = player.e.pn.add(10).max(10).log(10).pow(0.1).mul(0.1)
-                return base.add(0.1)
+                let base = player.e.pn.add(10).max(10).log(10).pow(0.1).mul(0.1).add(0.1)
+                base = base.mul(tmp.e.challenges[22].effect)
+                return base
             },
             effect() {
                 let base = tmp.e.buyables[32].base
@@ -891,7 +896,7 @@ addLayer("e", {
                 let s = player.e.pn
                 let exp = tmp.e.buyables[32].coste
                 let base = tmp.e.buyables[32].costbase
-                let target = s.div(base).log(100).root(exp)
+                let target = s.div(base).log(10).root(exp)
                 return target.floor().add(1)
             },
             buyMax() {
@@ -909,29 +914,29 @@ addLayer("e", {
                 return Decimal.pow(n(1.1), x.pow(exp)).mul(20).pow10().mul(base)
             },
             coste() {
-                let exp = 1.2
+                let exp = 1
                 return exp
             },
             costbase() {
-                let base = 1e7
+                let base = 1e9
                 return base
             },
             display() {
-                return "PN^(" + format(this.base()) + "<sup>x<sup>" + this.base2().toString() + "</sup></sup>+1)<br>当前:^" + format(this.effect()) + "<br>数量:" + format(player.e.buyables[33]) + "<br>价格:" + format(this.cost()) + "PN"
+                return "PN效果^(" + format(this.base()) + "<sup>x<sup>" + this.base2().toString() + "</sup></sup>+1)<br>当前:^" + format(this.effect()) + "<br>数量:" + format(player.e.buyables[33]) + "<br>价格:" + format(this.cost()) + "PN"
             },
             canAfford() { return player.e.pn.gte(this.cost()) },
             buy() {
                 if (!hm("a", 2)) player.e.pn = player.e.pn.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "PN-B-3" },
+            title() { return "E-PN-3" },
             base() {
-                let base = n(1.025)
-                if (hu("c", 35)) base = base.mul(player.e.pn.add(1e10).max(1e10).log(10).log(10).pow(0.4))
+                let base = n(1.05)
+                if (hu("c", 35)) base = base.add(player.e.pn.add(10).max(10).log(10).log(10).add(1).pow(0.4).sub(1).mul(0.02))
                 return base
             },
             base2() {
-                let base = 0.6
+                let base = 0.75
                 return base
             },
             effect() {
@@ -1027,7 +1032,7 @@ addLayer("e", {
             },
             canComplete: function () { return player.points.gte(this.goal()) },
             currencyDisplayName: "点数",
-            rewardDescription: "加成PM-B-1效果",
+            rewardDescription: "加成E-PM-1效果",
             completionLimit:5,
             effect() {
                 if (challengeCompletions("e", 21) >= 5) return (2 ** (challengeCompletions("e", 21) -4) ) * 10
@@ -1051,13 +1056,19 @@ addLayer("e", {
             },
             countsAs: [11, 12, 21],
             goal() {
-                let gc22 = [n(1e500),n('1.1981F7'),n('1.1981F6'),n('1.1981F7'),n('1.1981F8'),n('10^^1.7975e308')]
+                let gc22 = [n('e495'),n('e580'),n('e855'),n('1.1981F7'),n('1.1981F8'),n('10^^1.7975e308')]
                 return gc22[challengeCompletions('e', 22)]
             },
-            canComplete: function () { return player.points.gte(this.goal()) },
-            currencyDisplayName: "点数",
-            rewardDescription: "在第五次完成时解锁反-点数<br>",
+            canComplete: function () { return player.p.points.gte(this.goal()) },
+            currencyDisplayName: "声望点数",
+            rewardDescription: "在第三次完成时解锁反-点数<br>E-PN-2效果变得更好",
             completionLimit: 5,
+            effect() {
+                let c21 = (challengeCompletions("e", 22))
+                if (challengeCompletions('e', 22) >=3) return ((c21 - 2) * (1/15)) + 1.8 
+                return c21 * 0.4 + 1
+            },
+            rewardDisplay() { return "*" + format(this.effect()) },
             unlocked() {
                 return player.e.challenges[21] >= 5
             }

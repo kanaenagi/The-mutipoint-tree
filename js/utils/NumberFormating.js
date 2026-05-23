@@ -52,8 +52,8 @@ function format(decimal, precision = 3, small) {
     if (decimal.gte("eeee10")) {
         var slog = decimal.slog()
         if (slog.gte(1e6)) return "F" + format(slog.floor())
-        if (slog.gte(100)) return Decimal.pow(10, slog.sub(slog.floor())).toStringWithDecimalPlaces(3) + "F" + commaFormat(slog.floor(), 0)
-        else return Decimal.pow(10, slog.sub(slog.floor())).toStringWithDecimalPlaces(4) + "F" + commaFormat(slog.floor(), 0)
+        if (slog.gte(100)) return Decimal.tetrate(10, slog.sub(slog.floor())).toStringWithDecimalPlaces(3) + "F" + commaFormat(slog.floor(), 0)
+        else return Decimal.tetrate(10, slog.sub(slog.floor())).toStringWithDecimalPlaces(4) + "F" + commaFormat(slog.floor(), 0)
     }
     else if (decimal.gte("1ee9")) return exponentialFormat(decimal, 0, false)
     else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)

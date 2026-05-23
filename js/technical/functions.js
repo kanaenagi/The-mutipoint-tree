@@ -88,11 +88,13 @@ function sigmaCalculation(list) {
 
 //e后数字开根
 function expRoot(num, root) {
+    if (num.lt(1)) return num
     return n(10).pow(num.max(1).log10().add(1).root(root).sub(1))
 }
 
 //e后数字乘方
 function expPow(num, pow) {
+    if (num.lt(1)) return num
     return n(10).pow(num.max(1).log10().add(1).pow(pow).sub(1))
 }
 
@@ -139,7 +141,7 @@ function overflow(num, start, power, meta = 1) {
 }
 
 
-//添加指数塔
+
 function addTP(num, add) {
     if (isNaN(num.mag)) return new Decimal(0)
     return Decimal.tetrate(10, num.slog(10).add(add))
@@ -148,7 +150,7 @@ function addTP(num, add) {
 Decimal.prototype.addTP = function (power) {
     return addTP(this, power)
 }
-//乘数指数塔
+
 function mulTP(num, mul) {
     if (isNaN(num.mag)) return new Decimal(0)
     return Decimal.tetrate(10, num.slog(10).mul(mul))
@@ -182,19 +184,16 @@ Decimal.prototype.tetraflow = function (start, power) {
     return tetraflow(this, start, power)
 }
 
-
-const Baixie = "<img src = \"s297.jpg\" height = \"25\" width = \"25\">"
-
 function colorText(elem, color, text) {
     return "<" + elem + " style='color:" + color + ";text-shadow:0px 0px 10px;'>" + text + "</" + elem + ">"
 }
 
-const randomString_chars = `ABCDEFGHJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuwxyz1234567890?!;=+-/@#$%^&*~|"'()[]{},.`;
 function randomString(length) {
     let result = '';
-
+    let char = `ABCDEFGHJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuwxyz1234567890?!;=+-/@#$%^&*~|"'()[]{},.`;
+    
     for (let i = 0; i < length; i++) {
-        result += randomString_chars[Math.floor(Math.random() * randomString_chars.length)];
+        result += char[Math.floor(Math.random() * char.length)];
     }
 
     return result;

@@ -92,4 +92,6 @@ const hu = hasUpgrade
 
 const ha = hasAchievement
 
+const hc = hasChallenge
+
 const ue = upgradeEffect
