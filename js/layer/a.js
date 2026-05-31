@@ -94,7 +94,7 @@ addLayer("a", {
             ],
         },
         "Milestones": {
-            unlocked() { return false },
+            unlocked() { return true },
             name: "里程碑",
             content: ["main-display",
                 "prestige-button",
@@ -147,13 +147,13 @@ addLayer("a", {
     milestones: {
         0: {
             requirementDescription: "1 反-点数 (1)",
-            effectDescription: "自动购买E-PM-1,2,3,4,5,6 保留增强点数里程碑1,2,3,4,9 点数*100 压缩点数效果变得更好",
+            effectDescription: "自动购买E-PM-1,2,3,4,5,6 保留增强点数里程碑1,2,3,4 压缩点数价格/1e100",
             done() { return player.a.points.gte(1) },
             toggles: [["a", "pmat1"]],
         },
         1: {
             requirementDescription: "2 反-点数 (2)",
-            effectDescription: "自动购买增强点数和压缩点数升级 自动重置压缩点数 压缩点数不再重置所有东西 声望点数*1e9",
+            effectDescription: "自动购买增强点数和压缩点数升级 保留E5 自动重置压缩点数 压缩点数不再重置所有东西",
             done() { return player.a.points.gte(2) },
             toggles: [["a", "atcu"], ["a", "ateu"], ["a", "atcp"]],
         },

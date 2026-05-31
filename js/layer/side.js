@@ -130,9 +130,14 @@ addLayer("ach", {
         },
         33: {
             name: "进入第三行",
-            tooltip: "完成三次撕裂膨胀",
+            tooltip() { 
+                return "获取1反-点数<br>奖励:点数 声望点数 声望力量基于成就数量加成<br>当前:*"+format(this.effect())
+            },
+            effect() {
+                return Decimal.pow(2, player.ach.achievements.length)
+            },
             done() {
-                return player.e.challenges[22] >= 3
+                return player.a.points.gte(1)
             },
         },
     },

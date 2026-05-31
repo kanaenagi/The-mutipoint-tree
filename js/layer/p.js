@@ -33,7 +33,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
   },
   gainmult() {
     let mult = n(1)
-    if (hm("a", 1)) mult = mult.mul(1e9)
+    if (hm("a", 0)) mult = mult.mul(100)
     if (hu("p", 31)) mult = mult.mul(2)
     mult = mult.mul(tmp.p.buyables[12].effect)
     if (hu('p', 13)) mult = mult.mul(tmp.p.upgrades[13].effect)
@@ -42,6 +42,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     if (hu('c', 15)) mult = mult.mul(tmp.c.upgrades[15].effect)
     mult = mult.mul(tmp.e.effect)
     mult = mult.mul(tmp.e.buyables[23].effect)
+    if (ha("ach", 33)) mult = mult.mul(tmp.ach.achievements[33].effect)
     return mult
   },
   gainExp() {
@@ -86,6 +87,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     mult = mult.mul(tmp.e.buyables[21].effect)
     mult = mult.mul(tmp.c.effect[0])
     mult = mult.mul(basegain.pow(basegainexp))
+    if (ha("ach", 33)) mult = mult.mul(tmp.ach.achievements[33].effect)
     let exp = n(1)
     let gain = basegain.mul(mult).pow(exp)
     if (inChallenge("a", 11)) gain = gain.overflow(n(1e20), 0.5)

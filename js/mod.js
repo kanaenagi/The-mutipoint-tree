@@ -57,7 +57,7 @@ function getgainmult() {
 	mult = mult.mul(tmp.p.buyables[11].effect)
 	if (hu("p", 12)) mult = mult.mul(2)
 	if (hu("p", 31)) mult = mult.mul(10)
-	if (hm("a", 0)) mult = mult.mul(100)
+	if (ha("ach", 33)) mult = mult.mul(tmp.ach.achievements[33].effect)
 	return mult
 }
 

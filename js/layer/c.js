@@ -21,7 +21,11 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             dliationcount: 0,
         }
     },
-    requires: n("e600"),
+    requires() {
+        let req = n('e600')
+        if (hm('a', 0)) req = req.div(1e100)
+        return req
+    },
     color: "#EEEEEE",
     resource: "压缩点数",
     baseResource: "点数",
@@ -62,7 +66,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
     },
     gainExp() {
         let exp = n(1)
-        exp = exp.mul(tmp.c.buyables[103].effect.pow(-1))
+        exp = exp.div(tmp.c.buyables[103].effect)
         return exp
     },
     directMult() {
@@ -239,7 +243,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         },
         21: {
             title: "C6",
-            description: "对数领域奖励指数^1.25",
+            description: "声望削弱奖励指数^1.25",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
             cost: n("1e1931"),

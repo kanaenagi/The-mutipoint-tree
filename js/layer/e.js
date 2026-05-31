@@ -29,9 +29,10 @@ addLayer("e", {
         if (hm("a", 2)) keep.push("milestones", "challenges")
         if (hm("a", 4)) keep.push("ec4gain")
         if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
-        if (hm("a", 0) && !hm("a", 2)) player.e.milestones.push("0", "1", "2", "3", "8")
+        if (hm("a", 0) && !hm("a", 2)) player.e.milestones.push("0", "1", "2", "3")
+        if (hm('a', 1)) player.e.upgrades.push(15)
     },
-    autoUpgrade() { return false },
+    autoUpgrade() { return player.a.ateu },
     exponent() {
         let exp = 0.08
         return exp
