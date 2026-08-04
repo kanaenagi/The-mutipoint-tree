@@ -31,7 +31,6 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
     baseResource: "点数",
     doReset(resettingLayer) {
         let keep = ["dliationcount"]
-        if (hm("a", 4)) keep.push("dbpoint")
         if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
     },
     autoUpgrade() { return player.a.atcu },
@@ -115,11 +114,8 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             let mul = n(1)
             if (hu("c", 32)) mul = mul.mul(tmp.c.upgrades[32].effect)
             if (hu("c", 34)) mul = mul.mul(tmp.c.upgrades[34].effect)
-            /*
-            mul = mul.mul(expPow(player.p.points.div('1e6800'), 0.75).pow(0.01))
-            mul = mul.mul(expPow(player.e.points.div(1e230), 0.75).pow(0.1))
-            mul = mul.mul(Decimal.pow(4, player.c.points.sub(11).max(0)))
-            */
+            if (hm('a', 0)) mul = mul.mul(10)
+            if (hu('a', 11)) mul = mul.mul(tmp.a.upgrades[11].effect)
             return mul
         },
         next() {
@@ -179,10 +175,12 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
     },
     update(diff) {
         if (player.points.gte(player.c.dbpoint) && getClickableState("c", 11) == 1) player.c.dbpoint = player.points
-        if (hu("a", 13)) player.c.dbpoint = expPow(player.points, getpointdileff()).pow(1.25).max(player.c.dbpoint)
+        if (hm("a", 3)) player.c.dbpoint = expPow(player.points, getpointdileff()).max(player.c.dbpoint)
+        if (hm("a", 4)) player.c.sing = player.c.sing.add(tmp.c.sing.gain.mul(diff))
         if (hu("c", 15)) player.c.dp = player.c.dp.add(tmp.c.dpointgain.mul(diff))
         if (hu("c", 24)) player.c.ds = player.c.ds.add(tmp.c.dsgain).max(player.c.ds)
         if (player.a.dpat) { layers.c.buyables[11].buyMax(); layers.c.buyables[12].buyMax(); layers.c.buyables[13].buyMax(); layers.c.buyables[21].buyMax(); layers.c.buyables[22].buyMax(); layers.c.buyables[23].buyMax() }
+        if (player.a.siat) { layers.c.buyables[101].buyMax(); layers.c.buyables[102].buyMax(); layers.c.buyables[103].buyMax() }
     },
     upgrades: {
         11: {
@@ -281,7 +279,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         },
         25: {
             title: "C10",
-            description: "解锁奇点(还没做)",
+            description: "解锁奇点",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
             cost: n("1e3250"),
@@ -343,7 +341,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         },
         42: {
             title: "C17",
-            description: "解锁新的增强点数挑战",
+            description: "",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
             cost: n("e1652"),
@@ -367,7 +365,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         },
         45: {
             title: "C20",
-            description: "解锁新的增强点数挑战",
+            description: "",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
             cost: n("e1808"),
@@ -436,7 +434,8 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             canAfford() { return player.c.dp.gte(this.cost()) },
             buy() {
-                if (!hm("a", 3)) player.c.dp = player.c.dp.sub(this.cost())
+                if (player.c.dp.lt(this.cost())) return
+                player.c.dp = player.c.dp.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "C-dli-1" },
@@ -478,7 +477,8 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             canAfford() { return player.c.dp.gte(this.cost()) },
             buy() {
-                if (!hm("a", 3)) player.c.dp = player.c.dp.sub(this.cost())
+                if (player.c.dp.lt(this.cost())) return
+                player.c.dp = player.c.dp.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "C-dli-2" },
@@ -521,7 +521,8 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             canAfford() { return player.c.dp.gte(this.cost()) },
             buy() {
-                if (!hm("a", 3)) player.c.dp = player.c.dp.sub(this.cost())
+                if (player.c.dp.lt(this.cost())) return
+                player.c.dp = player.c.dp.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "C-dli-3" },
@@ -563,6 +564,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             canAfford() { return player.c.dp.gte(this.cost()) && hm("a", 6) },
             buy() {
+                if (player.c.dp.lt(this.cost())) return
                 player.c.dp = player.c.dp.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -605,6 +607,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             canAfford() { return player.c.dp.gte(this.cost()) && hm("a", 6) },
             buy() {
+                if (player.c.dp.lt(this.cost())) return
                 player.c.dp = player.c.dp.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -647,6 +650,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             canAfford() { return player.c.dp.gte(this.cost()) && hm("a", 6) },
             buy() {
+                if (player.c.dp.lt(this.cost())) return
                 player.c.dp = player.c.dp.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -689,7 +693,8 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             canAfford() { return player.c.sing.gte(this.cost()) },
             buy() {
-                if (!hm("a", 3)) player.c.sing = player.c.sing.sub(this.cost())
+                if (player.c.sing.lt(this.cost())) return 
+                player.c.sing = player.c.sing.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "C-Sing-1" },
@@ -704,7 +709,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             unlocked() { return true },
             maxAfford() {
-                let s = player.c.dp
+                let s = player.c.sing
                 let exp = tmp.c.buyables[101].coste
                 let target = s.div(10).log(100).root(exp)
                 return target.floor().add(1)
@@ -731,7 +736,8 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             canAfford() { return player.c.sing.gte(this.cost()) },
             buy() {
-                if (!hm("a", 3)) player.c.sing = player.c.sing.sub(this.cost())
+                if (player.c.sing.lt(this.cost())) return 
+                player.c.sing = player.c.sing.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "C-Sing-2" },
@@ -741,7 +747,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             unlocked() { return true },
             maxAfford() {
-                let s = player.c.dp
+                let s = player.c.sing
                 let exp = tmp.c.buyables[102].coste
                 let target = s.div(1e9).log(100).root(exp)
                 return target.floor().add(1)
@@ -768,7 +774,8 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             canAfford() { return player.c.sing.gte(this.cost()) },
             buy() {
-                if (!hm("a", 3)) player.c.sing = player.c.sing.sub(this.cost())
+                if (player.c.sing.lt(this.cost())) return 
+                player.c.sing = player.c.sing.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "C-Sing-3" },
@@ -778,7 +785,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             unlocked() { return true },
             maxAfford() {
-                let s = player.c.dp
+                let s = player.c.sing
                 let exp = tmp.c.buyables[103].coste
                 let target = s.div(0.001).log(10).div(20).log(1.1).root(exp)
                 return target.floor().add(1)
@@ -832,14 +839,15 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             unlocked() {
                 return hu("c", 15)
             },
-            canClick() { return true },
+            canClick() { return player.points.gte('e3250') },
             onClick() {
                 player.c.sing = player.c.sing.add(tmp.c.sing.gain)
                 doReset("e", true)
             },
             style: {
                 'height': '120px', 'width': '180px', 'font-size': '10px', "border-radius": "5%", "border": "4px solid", "border-color": "rgba(0, 0, 0, 0.125)", "background"() {
-                    let color = "#FFFFFF"
+                    let color = '#bf8f8f'
+                    if (player.points.gte('e3250')) color = '#FFFFFF'
                     return color
                 }
             }

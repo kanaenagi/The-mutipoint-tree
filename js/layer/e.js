@@ -26,11 +26,13 @@ addLayer("e", {
     doReset(resettingLayer) {
         let keep = []
         if (hm("a", 0)) keep.push("bxat1", "p1a1", "atup")
-        if (hm("a", 2)) keep.push("milestones", "challenges")
-        if (hm("a", 4)) keep.push("ec4gain")
-        if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
+        if (hm("a", 2)) keep.push("milestones")
+        if (hm("a", 3)) keep.push('challenges')
+        if (layers[resettingLayer].row > this.row) {
+        layerDataReset(this.layer, keep)
         if (hm("a", 0) && !hm("a", 2)) player.e.milestones.push("0", "1", "2", "3")
         if (hm('a', 1)) player.e.upgrades.push(15)
+        }
     },
     autoUpgrade() { return player.a.ateu },
     exponent() {
@@ -48,10 +50,9 @@ addLayer("e", {
         mult = mult.mul(tmp.e.buyables[22].effect)
         if (hu("c", 31)) mult = mult.mul(tmp.c.upgrades[31].effect)
         mult = mult.mul(tmp.c.buyables[12].effect)
-        mult = mult.mul(tmp.c.buyables[22].effect)
         mult = mult.mul(tmp.c.effect[1])
         if (hu("c", 55)) mult = mult.mul(100)
-        //mult = mult.mul(tmp.a.effect)
+        mult = mult.mul(tmp.a.effect)
         return mult
     },
     gainExp() {
@@ -75,12 +76,14 @@ addLayer("e", {
     },
     getResetGain() {
         if (player.p.pp.lt(tmp.e.requires)) return n(0)
-        let gain = player.p.pp.div(tmp.e.requires).max(1).pow(tmp.e.exponent).mul(tmp.e.gainMult).pow(tmp.e.gainExp)
+        let gain = player.p.pp.div(tmp.e.requires).max(1).pow(tmp.e.exponent).overflow('1e170', 0.9)
+        .mul(tmp.e.gainMult).pow(tmp.e.gainExp)
         if (getClickableState("c", 11) == 1 ) return expPow(gain, getpointdileff())
         return gain.floor()
     },
     getNextAt() {
-        let next = tmp.e.getResetGain.add(1).root(tmp.e.gainExp).div(tmp.e.gainMult).root(tmp.e.exponent).mul(tmp.e.requires).max(tmp.e.requires)
+        let next = tmp.e.getResetGain.add(1).root(tmp.e.gainExp).div(tmp.e.gainMult).overflow('1e170', 0.9 ** -1)
+        .root(tmp.e.exponent).mul(tmp.e.requires).max(tmp.e.requires)
         if (isNaN(next.mag)) return n(tmp.e.requires)
         if (getClickableState("c", 11) == 1 ) return expRoot(next, 0.75)
         return next
@@ -123,10 +126,11 @@ addLayer("e", {
         if (hu("c", 23)) mult = mult.mul(tmp.c.upgrades[23].effect)
         mult = mult.mul(tmp.e.buyables[31].effect)
         mult = mult.mul(tmp.c.buyables[101].effect)
-        
         mult = mult.mul(Decimal.pow(base, bexp))
         //mult = mult.mul(tmp.c.sing.eff)
+        if (hm('a', 2)) mult = mult.mul(10)
         if (hu("c", 35)) mult = mult.mul(100)
+        if (hm("a", 3)) mult = mult.mul(tmp.a.milestones[3].effect)
         let exp = n(1)
         
         let gain = base.mul(mult).pow(exp)
@@ -144,7 +148,7 @@ addLayer("e", {
     update(diff) {
         if (hm("e", 6)) player.e.pm = player.e.pm.add(tmp.e.pmGain.mul(diff))
         if (hm("e", 10)) player.e.pn = player.e.pn.add(tmp.e.pngain.mul(diff))
-        if (player.a.pmat1) {
+        if (player.a.pmat) {
             layers.e.buyables[11].buyMax()
             layers.e.buyables[12].buyMax()
             layers.e.buyables[13].buyMax()
@@ -522,7 +526,8 @@ addLayer("e", {
             },
             canAfford() { return player.points.gte(this.cost()) },
             buy() {
-                if (!hm("a", 0)) player.points = player.points.sub(this.cost())
+                if (player.points.lt(this.cost())) return
+                player.points = player.points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "E-PM-1" },
@@ -573,7 +578,8 @@ addLayer("e", {
             },
             canAfford() { return player.e.points.gte(this.cost()) },
             buy() {
-                if (!hm("a", 0)) player.e.points = player.e.points.sub(this.cost())
+                if (player.e.points.lt(this.cost())) return
+                player.e.points = player.e.points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "E-PM-2" },
@@ -623,7 +629,8 @@ addLayer("e", {
             },
             canAfford() { return player.e.pm.gte(this.cost()) },
             buy() {
-                if (!hm("a", 0)) player.e.pm = player.e.pm.sub(this.cost())
+                if (player.e.pm.lt(this.cost())) return
+                player.e.pm = player.e.pm.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "E-PM-3" },
@@ -671,7 +678,8 @@ addLayer("e", {
             },
             canAfford() { return player.e.pm.gte(this.cost()) },
             buy() {
-                if (!hm("a", 0)) player.e.pm = player.e.pm.sub(this.cost())
+                if (player.e.pm.lt(this.cost())) return
+                player.e.pm = player.e.pm.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "E-PM-4" },
@@ -705,7 +713,6 @@ addLayer("e", {
                 let x = player.e.buyables[22]
                 let exp = tmp.e.buyables[22].coste
                 let base = tmp.e.buyables[22].costbase
-                if (x.gte(100)) x = x.div(100).pow(2).mul(100)
                 return n(10).pow(x.pow(exp)).mul(base)
             },
             coste() {
@@ -721,7 +728,8 @@ addLayer("e", {
             },
             canAfford() { return player.e.pm.gte(this.cost()) },
             buy() {
-                if (!hm("a", 0)) player.e.pm = player.e.pm.sub(this.cost())
+                if (player.e.pm.lt(this.cost())) return
+                player.e.pm = player.e.pm.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "E-PM-5" },
@@ -741,7 +749,6 @@ addLayer("e", {
                 let exp = tmp.e.buyables[22].coste
                 let base = tmp.e.buyables[22].costbase
                 let target = s.div(base).log(10).root(exp)
-                if (target.gte(100)) target = target.div(100).root(2).mul(100)
                 return target.floor().add(1)
             },
             buyMax() {
@@ -778,7 +785,8 @@ addLayer("e", {
             },
             canAfford() { return player.e.pm.gte(this.cost()) },
             buy() {
-                if (!hm("a", 0)) player.e.pm = player.e.pm.sub(this.cost())
+                if (player.e.pm.lt(this.cost())) return
+                player.e.pm = player.e.pm.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "E-PM-6" },
@@ -829,7 +837,8 @@ addLayer("e", {
             },
             canAfford() { return player.e.pn.gte(this.cost()) },
             buy() {
-                if (!hm("a", 2)) player.e.pn = player.e.pn.sub(this.cost())
+                if (player.e.pn.lt(this.cost())) return
+                player.e.pn = player.e.pn.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "E-PN-1" },
@@ -878,7 +887,8 @@ addLayer("e", {
             },
             canAfford() { return player.e.pn.gte(this.cost()) },
             buy() {
-                if (!hm("a", 2)) player.e.pn = player.e.pn.sub(this.cost())
+                if (player.e.pn.lt(this.cost())) return
+                player.e.pn = player.e.pn.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "E-PN-2" },
@@ -927,7 +937,8 @@ addLayer("e", {
             },
             canAfford() { return player.e.pn.gte(this.cost()) },
             buy() {
-                if (!hm("a", 2)) player.e.pn = player.e.pn.sub(this.cost())
+                if (player.e.pn.lt(this.cost())) return
+                player.e.pn = player.e.pn.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
             title() { return "E-PN-3" },
@@ -1057,7 +1068,7 @@ addLayer("e", {
             },
             countsAs: [11, 12, 21],
             goal() {
-                let gc22 = [n('e495'),n('e580'),n('e855'),n('1.1981F7'),n('1.1981F8'),n('10^^1.7975e308')]
+                let gc22 = [n('e495'),n('e580'),n('e850'),n('e1000'),n('1.1981F8'),n('10^^1.7975e308')]
                 return gc22[challengeCompletions('e', 22)]
             },
             canComplete: function () { return player.p.points.gte(this.goal()) },

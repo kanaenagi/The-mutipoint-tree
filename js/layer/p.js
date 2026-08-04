@@ -33,7 +33,6 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
   },
   gainmult() {
     let mult = n(1)
-    if (hm("a", 0)) mult = mult.mul(100)
     if (hu("p", 31)) mult = mult.mul(2)
     mult = mult.mul(tmp.p.buyables[12].effect)
     if (hu('p', 13)) mult = mult.mul(tmp.p.upgrades[13].effect)
@@ -53,13 +52,13 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
   getResetGain() {
     let gain = player.points.div(10).pow(tmp.p.exponent).mul(tmp.p.gainmult).pow(tmp.p.gainExp)
     if (inChallenge('e', 11)) gain = gain.pow(0.35)
-    if (getClickableState("c", 11) == 1 && !hu("a", 11)) gain = expPow(gain, getpointdileff())
+    if (getClickableState("c", 11) == 1)  gain = expPow(gain, getpointdileff())
     if (player.points.lt(10)) return n(0)
     return gain.floor()
   },
   getNextAt() {
     let amt = tmp.p.getResetGain.add(1)
-    if (getClickableState("c", 11) == 1 && !hu("a", 11)) amt = expRoot(amt, getpointdileff())
+    if (getClickableState("c", 11) == 1)  amt = expRoot(amt, getpointdileff())
     if (inChallenge('e', 11)) amt = amt.root(0.35)
     let next = amt.root(tmp.p.gainExp).div(tmp.p.gainmult).root(tmp.p.exponent).max(1).mul(10)
     return next
@@ -84,14 +83,14 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     if (hu("p", 23)) mult = mult.mul(tmp.p.upgrades[23].effect)
     if (hu("p", 44)) mult = mult.mul(tmp.p.upgrades[44].effect)
     if (hu("p", 54)) mult = mult.mul(tmp.p.upgrades[54].effect)
+    if (hu('a', 13)) mult = mult.mul(tmp.a.upgrades[13].effect)
     mult = mult.mul(tmp.e.buyables[21].effect)
     mult = mult.mul(tmp.c.effect[0])
     mult = mult.mul(basegain.pow(basegainexp))
     if (ha("ach", 33)) mult = mult.mul(tmp.ach.achievements[33].effect)
     let exp = n(1)
     let gain = basegain.mul(mult).pow(exp)
-    if (inChallenge("a", 11)) gain = gain.overflow(n(1e20), 0.5)
-    if (getClickableState("c", 11) == 1 && !hu("a", 11)) return expPow(gain, getpointdileff())
+    if (getClickableState("c", 11) == 1 ) return expPow(gain, getpointdileff())
     return gain
   },
   PPeff() {
@@ -102,7 +101,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     let eff = expPow(player.p.pp.add(1).max(1), 0.8)
     eff = eff.max(1).pow(exp)
     eff = expPow(eff, exp2)
-    return eff
+    return eff.softcap('e6500', 1/3)
   },
   update(diff) {
     if (hm("p", 0) && player.p.points.gte(1e8)) player.p.pp = player.p.pp.add(tmp.p.PPgain.times(diff))
@@ -160,7 +159,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
         }],
         ["row", [["buyable", 111], ["buyable", 112], ["buyable", 113]]],
         ["blank", "50px"],
-        ["display-text", function () { if (tmp.p.PPeff.gte("e10000")) return "<br><span style='color:red' > 由于声望力量效果超过了" + format("1e10000") + " 声望力量效果将受到软上限限制 </span>" }],
+        ["display-text", function () { if (tmp.p.PPeff.gte("e6500")) return "<br><span style='color:red' > 由于声望力量效果超过了" + format("1e6500") + " 声望力量效果将受到软上限限制 </span>" }],
       ],
     },
   },
@@ -174,8 +173,8 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
         if (hu("p", 21)) u1 = u1.add(player.p.upgrades.length * 0.2)
         u1 = u1.add(tmp.p.buyables[13].effect)
         if (hu("p", 51)) u1 = u1.add(tmp.p.upgrades[51].effect)
-        //u1 = u1.add(tmp.a.challenges[11].effect)
         if (hu("p", 35)) u1 = u1.mul(tmp.p.upgrades[35].effect)
+        u1 = u1.mul(tmp.a.challenges[11].effect)
         return u1
       },
       baseeffect() {
@@ -438,7 +437,8 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       },
       canAfford() { return player[this.layer].points.gte(this.cost()) },
       buy() {
-        if (!hm("e", 0)) player[this.layer].points = player[this.layer].points.sub(this.cost())
+        if (player[this.layer].points.lt(this.cost())) return
+        player[this.layer].points = player[this.layer].points.sub(this.cost())
         setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
       },
       title() { return "P-B-1" },
@@ -491,7 +491,8 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       },
       canAfford() { return player[this.layer].points.gte(this.cost()) },
       buy() {
-        if (!hm("e", 0)) player[this.layer].points = player[this.layer].points.sub(this.cost())
+        if (player[this.layer].points.lt(this.cost())) return
+        player[this.layer].points = player[this.layer].points.sub(this.cost())
         setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
       },
       title() { return "P-B-2" },
@@ -537,7 +538,8 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       },
       canAfford() { return player[this.layer].points.gte(this.cost()) },
       buy() {
-        if (!hm("e", 0)) player[this.layer].points = player[this.layer].points.sub(this.cost())
+        if (player[this.layer].points.lt(this.cost())) return
+        player[this.layer].points = player[this.layer].points.sub(this.cost())
         setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
       },
       title() { return "P-B-3" },
@@ -577,7 +579,8 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       display() { return "声望力量*" + format(tmp.p.buyables[111].base) + "<br>当前:*" + format(tmp.p.buyables[111].effect) + "<br>价格:" + format(tmp.p.buyables[111].cost) + "声望力量<br>数量:" + formatWhole(player.p.buyables[111]) },
       canAfford() { return player[this.layer].pp.gte(this.cost()) },
       buy() {
-        if (!hm("e", 2)) player[this.layer].pp = player[this.layer].pp.sub(this.cost())
+        if (player[this.layer].pp.lt(this.cost())) return
+        player[this.layer].pp = player[this.layer].pp.sub(this.cost())
         setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
       },
       base() {
@@ -589,7 +592,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       effect() {
         let x = getBuyableAmount("p", 111)
         let base = tmp.p.buyables[111].base
-        return inChallenge("a", 11) ? n(2) : Decimal.pow(base, x)
+        return inChallenge("a", 11) ? n(1) : Decimal.pow(base, x)
       },
       unlocked() { return hm('p', 0) },
       maxAfford() {
@@ -619,7 +622,8 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       display() { let a = ""; return "声望力量基础指数+" + format(tmp.p.buyables[112].base) + "<br>当前:+" + format(tmp.p.buyables[112].effect) + a + "<br>价格:" + format(tmp.p.buyables[112].cost) + "声望点数<br>数量:" + formatWhole(player.p.buyables[112]) },
       canAfford() { return player[this.layer].points.gte(this.cost()) },
       buy() {
-        if (!hm("e", 2)) player[this.layer].points = player[this.layer].points.sub(this.cost())
+        if (player[this.layer].pp.lt(this.cost())) return
+        player[this.layer].pp = player[this.layer].pp.sub(this.cost())
         setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
       },
       base() {
@@ -632,7 +636,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       effect() {
         let x = getBuyableAmount("p", 112)
         let base = tmp.p.buyables[112].base
-        return inChallenge("a", 11) ? n(2) : base.mul(x)
+        return inChallenge("a", 11) ? n(1) : base.mul(x)
       },
       unlocked() { return hm('p', 0) },
       maxAfford() {
@@ -666,7 +670,8 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       },
       canAfford() { return player[this.layer].pp.gte(this.cost()) },
       buy() {
-        if (!hm("e", 2)) player[this.layer].pp = player[this.layer].pp.sub(this.cost())
+        if (player[this.layer].pp.lt(this.cost())) return
+        player[this.layer].pp = player[this.layer].pp.sub(this.cost())
         setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
       },
       bonus() {
@@ -682,7 +687,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       effect() {
         let x = getBuyableAmount("p", 113).add(tmp.p.buyables[this.id].bonus)
         let base = tmp.p.buyables[113].base
-        return inChallenge("a", 11) ? n(2) : base.pow(x)
+        return inChallenge("a", 11) ? n(1) : base.pow(x)
       },
       unlocked() { return hm('p', 0) },
       maxAfford() {
