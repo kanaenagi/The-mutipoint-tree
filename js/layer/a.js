@@ -23,7 +23,7 @@ addLayer("a", {
         }
     },
     color: "#e34f9e",
-    requires: n("1e5000"),
+    requires: n("1e4850"),
     resource: "反-点数",
     baseResource: "增强点数",
     branches: ["e", "c"],
@@ -47,6 +47,10 @@ addLayer("a", {
         let dis = "增强点数*<h2 style='color: #e34f9e; text-shadow: 0 0 10px #e34f9e'>" + format(tmp.a.effect) + "</h2>"
         return dis
     },
+    boostereff() {
+        let eff = Array.from({ length: 4 }, () => n(1))
+        return eff
+    },
     exponent2() {
         let exp = 0.95
         return exp
@@ -66,12 +70,12 @@ addLayer("a", {
         return exp
     },
     getResetGain() {
-        if (player.e.points.lt("1e5000")) return n(0)
-        let gain = player.e.points.div("1e500").max(1).pow(tmp.a.exponent).mul(tmp.a.gainMult).pow(tmp.a.gainExp)
+        if (player.e.points.lt("1e4850")) return n(0)
+        let gain = expPow(player.e.points.div("1e485").max(1), tmp.a.exponent2).pow(tmp.a.exponent).softcap(10, 1000, 1).softcap(100, 0.5).mul(tmp.a.gainMult).pow(tmp.a.gainExp)
         return gain.floor()
     },
     getNextAt() {
-        let next = tmp.a.getResetGain.add(1).root(tmp.a.gainExp).div(tmp.a.gainMult).root(tmp.a.exponent).mul("e500").max("e5000")
+        let next = expRoot(tmp.a.getResetGain.add(1).root(tmp.a.gainExp).div(tmp.a.gainMult).anti_softcap(100, 0.5).anti_softcap(10, 1000, 1).root(tmp.a.exponent), tmp.a.exponent2).mul("e4850").max("e4850")
         return next
     },
     update(diff) {
@@ -119,31 +123,41 @@ addLayer("a", {
     upgrades: {
         11: {
             title: "A1",
-            description: "",
-            cost: n(25),
+            description: "反-点数加成奇点",
+            effect() { return player.a.points.max(1).pow(0.5) },
+            effectDisplay() { return "*" + format(upgradeEffect('a', 11)) },
+            cost: n(1000),
             unlocked() { return true },
         },
         12: {
             title: "A2",
-            description: "反-点数削弱压缩点数价格 反-点数*10",
+            description: "反-点数削弱压缩点数价格",
             effect() { return player.a.points.max(1).pow(125) },
             effectDisplay() { return "/" + format(upgradeEffect('a', 12)) },
-            cost: n(100),
+            cost: n(2500),
             unlocked() { return hu("a", 11) },
         },
         13: {
             title: "A3",
-            description: "你可以自动更新点数膨胀内最佳点数 并且效果更好",
-            cost: n(1000),
+            description: "增强点数加成声望力量",
+            effect() { return expPow(player.e.points.max(1), 0.6) },
+            effectDisplay() { return "*" + format(upgradeEffect('a', 13)) },
+            cost: n(1000000),
             unlocked() { return hu("a", 12) },
         },
         14: {
             title: "A4",
             description: "基于反点数挑战完成次数加成反-点数",
-            effect() { return Decimal.pow(2,player.a.chalcount[1]) },
+            effect() { return Decimal.pow(2, player.a.chalcount[1]) },
             effectDisplay() { return "*" + format(upgradeEffect('a', 14)) },
-            cost: n(10000),
+            cost: n(2500000),
             unlocked() { return hu("a", 13) },
+        },
+        15: {
+            title: "A5",
+            description: "解锁第1-2行层级更多升级",
+            cost: n(50000000),
+            unlocked() { return hu("a", 14) },
         },
     },
     milestones: {
@@ -211,8 +225,9 @@ addLayer("a", {
                 if (player.points.lte(1e280)) return n(0)
                 return x.floor()
             },
+            getNextAt(a) {
                 let amt = tmp.a.challenges[11].countcalc.max(player.a.chalcount[1])
-                if (a) amt = a
+                if (!inChallenge('a', 11)) amt = player.a.chalcount[1]
                 let next = Decimal.pow(1e28, amt.pow(1.25)).mul(1e280)
                 return next
             },
@@ -230,5 +245,5 @@ addLayer("a", {
             marked() { return false },
         },
     },
-    layerShown() { return ( player.e.challenges[22] >= 5 || player.a.total.gte(1) || ha("ach", 34)) },
+    layerShown() { return (player.e.challenges[22] >= 5 || player.a.total.gte(1) || ha("ach", 34)) },
 })
