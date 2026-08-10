@@ -622,8 +622,8 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       display() { let a = ""; return "声望力量基础指数+" + format(tmp.p.buyables[112].base) + "<br>当前:+" + format(tmp.p.buyables[112].effect) + a + "<br>价格:" + format(tmp.p.buyables[112].cost) + "声望点数<br>数量:" + formatWhole(player.p.buyables[112]) },
       canAfford() { return player[this.layer].points.gte(this.cost()) },
       buy() {
-        if (player[this.layer].pp.lt(this.cost())) return
-        player[this.layer].pp = player[this.layer].pp.sub(this.cost())
+        if (player[this.layer].points.lt(this.cost())) return
+        player[this.layer].points = player[this.layer].points.sub(this.cost())
         setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
       },
       base() {
