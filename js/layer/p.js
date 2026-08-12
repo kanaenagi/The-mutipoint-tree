@@ -381,13 +381,13 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       cost: n("1e170000000000000"),
       effect() { return expPow(player.p.points.div("1e1600").max(10).log(10), 2) },
       effectDisplay() { return "*" + format(upgradeEffect('p', 52)) },
-      unlocked() { return hu('p', 51) },
+      unlocked() { return hu('p', 510) },
     },
     53: {
       title: "P23",
       description: "削弱P-B-1价格",
       cost: n("1ee1870"),
-      unlocked() { return hu('p', 520) },
+      unlocked() { return hu('p', 52) },
     },
     54: {
       title: "P24",
