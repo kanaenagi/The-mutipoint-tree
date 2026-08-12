@@ -22,6 +22,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     let keep = []
     let ku = []
     if (hm("e", 2)) ku.push("22")
+    if (hm('a', 2)) keep.push('milestones')
     if (layers[resettingLayer].row > this.row) {
       layerDataReset(this.layer, keep)
       player.p.upgrades = ku
@@ -47,6 +48,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
   gainExp() {
     let exp = n(1)
     exp = exp.mul(tmp.c.buyables[102].effect)
+    exp = exp.mul(tmp.a.buyables[11].effect)
     return exp
   },
   getResetGain() {
@@ -101,7 +103,9 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     let eff = expPow(player.p.pp.add(1).max(1), 0.8)
     eff = eff.max(1).pow(exp)
     eff = expPow(eff, exp2)
-    return eff.softcap('e6500', 1/3)
+
+    let sp = 1/3
+    return eff.softcap('e6500', sp)
   },
   update(diff) {
     if (hm("p", 0) && player.p.points.gte(1e8)) player.p.pp = player.p.pp.add(tmp.p.PPgain.times(diff))
@@ -159,7 +163,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
         }],
         ["row", [["buyable", 111], ["buyable", 112], ["buyable", 113]]],
         ["blank", "50px"],
-        ["display-text", function () { if (tmp.p.PPeff.gte("e6500")) return "<br><span style='color:red' > 由于声望力量效果超过了" + format("1e6500") + " 声望力量效果将受到软上限限制 </span>" }],
+        ["display-text", function () { if (tmp.p.PPeff.gte('e6500')) return "<br><span style='color:red' > 由于声望力量效果超过了" + format('e6500') + " 声望力量效果将受到软上限限制 </span>" }],
       ],
     },
   },
@@ -172,7 +176,6 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
         if (hu("p", 15)) u1 = u1.add(1)
         if (hu("p", 21)) u1 = u1.add(player.p.upgrades.length * 0.2)
         u1 = u1.add(tmp.p.buyables[13].effect)
-        if (hu("p", 51)) u1 = u1.add(tmp.p.upgrades[51].effect)
         if (hu("p", 35)) u1 = u1.mul(tmp.p.upgrades[35].effect)
         u1 = u1.mul(tmp.a.challenges[11].effect)
         return u1
@@ -286,7 +289,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     },
     33: {
       title: "P13",
-      description: "基于声望点数加成P3",
+      description: "基于声望点数加成E1",
       effect() {
         return player.p.points.add(1).log(10).pow(0.5).mul(0.1)
       },
@@ -318,7 +321,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     },
     41: {
       title: "P16",
-      description: "基于声望力量增强PN",
+      description: "基于声望力量加成PN",
       cost: n("1e4080"),
       effect() {
         let eff = expPow(player.p.pp.add(10).max(10).log(10), 2)
@@ -363,19 +366,19 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     },
     51: {
       title: "P21",
-      description: "PN加成P1基础指数",
-      cost: n("1e17000000"),
+      description: "声望点数加成反-点数",
+      cost: n("1e15600"),
       effect() {
-        let eff = player.e.pn.add(10).max(10).log(10).add(9).log(10).add(0.2).pow(4).add(0.25)
+        let eff = player.p.points.max(10).log(10).pow(0.25)
         return eff
       },
-      effectDisplay() { return "+" + format(upgradeEffect('p', 51)) },
-      unlocked() { return hu('p', 450) },
+      effectDisplay() { return "*" + format(upgradeEffect('p', 51)) },
+      unlocked() { return hu('p', 45) && hu('a', 15) },
     },
     52: {
       title: "P22",
       description: "声望点数加成PM",
-      cost: n("1e1700"),
+      cost: n("1e170000000000000"),
       effect() { return expPow(player.p.points.div("1e1600").max(10).log(10), 2) },
       effectDisplay() { return "*" + format(upgradeEffect('p', 52)) },
       unlocked() { return hu('p', 51) },
@@ -383,8 +386,8 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
     53: {
       title: "P23",
       description: "削弱P-B-1价格",
-      cost: n("1e1870"),
-      unlocked() { return hu('p', 52) },
+      cost: n("1ee1870"),
+      unlocked() { return hu('p', 520) },
     },
     54: {
       title: "P24",
@@ -545,6 +548,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       title() { return "P-B-3" },
       base() {
         let base = n(0.2)
+        base = base.mul(tmp.c.buyables[23].effect)
         return base
       },
       effect() {
@@ -665,7 +669,7 @@ addLayer("p", { //喜欢不内置vue的小朋友们叉出去
       },
       display() {
         let a = ''
-        if (!this.bonus().eq(0)) a = '+' + formatWhole(tmp.p.buyables[this.id].bonus)
+        if (!tmp.p.buyables[this.id].bonus.eq(0)) a = ' + ' + format(tmp.p.buyables[this.id].bonus)
         return "声望力量效果^" + format(tmp.p.buyables[113].base) + "<br>当前:^" + format(tmp.p.buyables[113].effect) + "<br>价格:" + format(tmp.p.buyables[113].cost) + "声望力量<br>数量:" + formatWhole(player.p.buyables[113])  + a 
       },
       canAfford() { return player[this.layer].pp.gte(this.cost()) },

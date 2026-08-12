@@ -122,8 +122,8 @@ addLayer("ach", {
             },
         },
         32: {
-            name: "1组压缩点数",
-            tooltip: "获取16压缩点数<br>这个堆叠上限只有16",
+            name: "二重压缩点数",
+            tooltip: "获取16压缩点数",
             done() {
                 return player.c.points.gte(16)
             },
@@ -138,6 +138,27 @@ addLayer("ach", {
             },
             done() {
                 return player.a.points.gte(1)
+            },
+        },
+        34: {
+            name: "指数推进",
+            tooltip: "解锁推进器",
+            done() {
+                return hu('a', 15)
+            },
+        },
+        35: {
+            name: "完全挑战 I",
+            tooltip: "完成所有增强点数挑战5次",
+            done() {
+                return player.e.challenges[11] >= 5 && player.e.challenges[12] >= 5 && player.e.challenges[21] >= 5 && player.e.challenges[22] >= 5
+            },
+        },
+        36: {
+            name: "'无效'压缩",
+            tooltip: "完成10次无效压缩",
+            done() {
+                return player.a.chalcount[2].gte(10)
             },
         },
     },

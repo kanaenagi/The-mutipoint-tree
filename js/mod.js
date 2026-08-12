@@ -10,11 +10,15 @@ let modInfo = {
 	offlineLimit: 900,  // In second
 }
 let VERSION = {
-	num: "0.1.2",
-	name: "反转启动",  
+	num: "0.2",
+	name: "反转增幅",  
 }
 
 let changelog = `<h1>更新日志:</h1><br>
+	<h3>V0.2</h3><br>
+	- 添加了1个层级<br>
+	- 残局：1e14000点数<br>
+	- 成就数量：18<br>
 	<h3>V0.1.2</h3><br>
 	- 添加了奇点<br>
 	- 残局：1e6400点数<br>
@@ -58,6 +62,7 @@ function getgainmult() {
 	if (hu("p", 12)) mult = mult.mul(2)
 	if (hu("p", 31)) mult = mult.mul(10)
 	if (ha("ach", 33)) mult = mult.mul(tmp.ach.achievements[33].effect)
+	mult = mult.mul(tmp.a.boostereff)
 	return mult
 }
 
@@ -68,6 +73,7 @@ function getPointGen() {
 	gain = gain.mul(getgainmult())
 	gain = gain.pow(getgainexp())
 	gain = gain.max(0)
+	if (inChallenge('a', 12)) gain = gain.pow(0.5)
 	if (inChallenge("e", 12)) gain = expPow(gain, 0.5)
 	if (getClickableState("c", 11) == 1) gain = expPow(gain, getpointdileff())
 	//let gainslog = gain.slog(10) ; gainslog = gainslog.min(1.797e308) ; gain = Decimal.tetrate(10, gainslog)
@@ -82,7 +88,7 @@ function addedPlayerData() {
 
 var displayThings = [
 	function () {
-		let a = "残局:1.000e6400点数"
+		let a = "残局:" + format('1e14000') +"点数"
 		/*
 		let tick = 0
     	for (i = 0; i<lastTenTicks.length; i++){
@@ -96,7 +102,7 @@ var displayThings = [
 ]
 
 function isEndgame() {
-	return player.points.gte("1e6400")
+	return player.points.gte("1e14000")
 }
 
 var backgroundStyle = {

@@ -57,6 +57,7 @@ addLayer("e", {
     },
     gainExp() {
         let exp = n(1)
+        exp = exp.mul(tmp.a.buyables[12].effect)
         return exp
     },
     passiveGeneration() {
@@ -91,7 +92,7 @@ addLayer("e", {
     pmGain() {
         if (!hm("e", 6)) return n(0)
         let base = tmp.e.buyables[11].effect
-        // base = base.mul(tmp.c.buyables[22].effect)
+        base = base.mul(tmp.c.buyables[22].effect)
         let bexp = n(0)
         if (hm("e", 9)) bexp = bexp.add(3)
         if (hu("e", 33)) bexp = bexp.add(3)
@@ -358,20 +359,20 @@ addLayer("e", {
         41: {
             title: "E16",
             description: "削弱E-PM-1基础价格",
-            cost: n(2.15e84),
-            unlocked() { return hu("e", 350) },
+            cost: n('e690'),
+            unlocked() { return hu("e", 35) && hu("a", 15) },
         },
         42: {
             title: "E17",
             description: "E-PM-4基础效果^1.2",
-            cost: n(1e104),
+            cost: n('e860'),
             unlocked() { return hu("e", 41) },
         },
         43: {
             title: "E18",
             description: "'对数领域'奖励指数^1.05",
-            cost: n(1e144),
-            unlocked() { return hu("e", 42) },
+            cost: n('ee355'),
+            unlocked() { return hu("e", 420) },
         },
         44: {
             title: "E19",
@@ -933,7 +934,8 @@ addLayer("e", {
                 return base
             },
             display() {
-                return "PN效果^(" + format(this.base()) + "<sup>x<sup>" + this.base2().toString() + "</sup></sup>+1)<br>当前:^" + format(this.effect()) + "<br>数量:" + format(player.e.buyables[33]) + "<br>价格:" + format(this.cost()) + "PN"
+                let a = !tmp.e.buyables[this.id].bonus.eq(0) ? " + " + format(tmp.e.buyables[this.id].bonus) : ''
+                return "PN效果^(" + format(this.base()) + "<sup>x<sup>" + this.base2().toString() + "</sup></sup>+1)<br>当前:^" + format(this.effect()) + "<br>数量:" + format(player.e.buyables[33]) +  a + "<br>价格:" + format(this.cost()) + "PN" 
             },
             canAfford() { return player.e.pn.gte(this.cost()) },
             buy() {
@@ -951,10 +953,15 @@ addLayer("e", {
                 let base = 0.75
                 return base
             },
+            bonus() {
+                let x = n(0)
+                return x
+            },
             effect() {
                 let base = tmp.e.buyables[33].base
                 let base2 = tmp.e.buyables[33].base2
                 let x = player.e.buyables[33]
+                x = x.add(this.bonus())
                 return Decimal.pow(base, x.pow(base2))
             },
             unlocked() { return hm('e', 7) },
@@ -1068,7 +1075,7 @@ addLayer("e", {
             },
             countsAs: [11, 12, 21],
             goal() {
-                let gc22 = [n('e495'),n('e580'),n('e850'),n('e1000'),n('1.1981F8'),n('10^^1.7975e308')]
+                let gc22 = [n('e495'),n('e580'),n('e850'),n('e1000'),n('e1400'),n('10^^1.7975e308')]
                 return gc22[challengeCompletions('e', 22)]
             },
             canComplete: function () { return player.p.points.gte(this.goal()) },

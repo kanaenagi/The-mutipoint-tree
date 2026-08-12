@@ -24,7 +24,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
     requires() {
         let req = n('e600')
         if (hm('a', 0)) req = req.div(1e100)
-        return req
+        return inChallenge('a', 12)? n(1/0) : req
     },
     color: "#EEEEEE",
     resource: "压缩点数",
@@ -70,13 +70,16 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
     },
     directMult() {
         let mul = n(1)
+        mul = mul.mul(tmp.a.buyables[13].effect)
         return mul
     },
     dpointgain() {
         if (player.c.dbpoint.lt(1e48)) return n(0)
         let gain = expPow(player.c.dbpoint.div(1e47).max(1).log(10).pow(3), 1.4)
+        gain = gain.pow(tmp.a.challenges[12].effect)
         if (hu("p", 43)) gain = gain.mul(ue('p', 43))
         gain = gain.mul(tmp.c.buyables[11].effect)
+        if (hu('c', 42)) gain = gain.mul(ue('c', 23))
         if (hu("c", 44)) gain = gain.mul(10)
         if (hu("c", 51)) gain = gain.mul(tmp.c.upgrades[51].effect)
         if (hu("e", 55)) gain = gain.mul(1000)
@@ -100,7 +103,9 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         return next
     },
     dseff() {
-        let eff = Decimal.pow(100, player.c.ds)
+        let amt = player.c.ds
+        if (hu('c', 41)) amt = amt.pow(1.1)
+        let eff = Decimal.pow(100, amt)
         return eff
     },
     sing: {
@@ -333,18 +338,18 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         },
         41: {
             title: "C16",
-            description: "",
+            description: "膨胀碎片效果变得更好",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("1e1569"),
-            unlocked() { return hu("c", 350) },
+            cost: n("1e9700"),
+            unlocked() { return hu("c", 35) && hu('a', 15) },
         },
         42: {
             title: "C17",
-            description: "",
+            description: "C8也加成膨胀点数",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("e1652"),
+            cost: n("e11450"),
             unlocked() { return hu("c", 41) },
         },
         43: {
@@ -352,12 +357,12 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             description: "削弱E-PM-6价格",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("e1694"),
-            unlocked() { return hu("c", 42) },
+            cost: n("ee1694"),
+            unlocked() { return hu("c", 420) },
         },
         44: {
             title: "C19",
-            description: "膨胀点数*10 如果你在点数膨胀中 点数^1.075",
+            description: "膨胀点数*10",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
             cost: n("e1735"),
@@ -514,6 +519,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             coste() {
                 let exp = 1.8
+                if (hu('a', 21)) exp -= 0.3
                 return exp
             },
             display() {
@@ -553,7 +559,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             cost() {
                 let x = player.c.buyables[21]
                 let exp = tmp.c.buyables[21].coste
-                return n(1e12).pow(x.pow(exp)).mul(1e73)
+                return n(1e10).pow(x.pow(exp)).mul('1e100')
             },
             coste() {
                 let exp = 1.5
@@ -568,9 +574,9 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 player.c.dp = player.c.dp.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "dil-B-4" },
+            title() { return "C-dil-4" },
             base() {
-                let base = player.c.dp.add(10).max(10).log(10).pow(0.5)
+                let base = player.c.dp.add(10).max(10).log(10).pow(0.02)
                 return base
             },
             effect() {
@@ -582,7 +588,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             maxAfford() {
                 let s = player.c.dp
                 let exp = tmp.c.buyables[21].coste
-                let target = s.div(1e73).log(1e12).root(exp)
+                let target = s.div('1e100').log(1e10).root(exp)
                 return target.floor().add(1)
             },
             buyMax() {
@@ -596,10 +602,10 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             cost() {
                 let x = player.c.buyables[22]
                 let exp = tmp.c.buyables[22].coste
-                return n(100000).pow(x.pow(exp)).mul(1e90)
+                return n(10000).pow(x.pow(exp)).mul('1e630')
             },
             coste() {
-                let exp = 1.65
+                let exp = 1.6
                 return exp
             },
             display() {
@@ -611,7 +617,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 player.c.dp = player.c.dp.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "dil-B-5" },
+            title() { return "C-dil-5" },
             base() {
                 let base = player.c.dp.add(10).max(10).log(10).pow(0.01).add(0.01)
                 return base
@@ -625,7 +631,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             maxAfford() {
                 let s = player.c.dp
                 let exp = tmp.c.buyables[22].coste
-                let target = s.div(1e90).log(100000).root(exp)
+                let target = s.div('1e630').log(10000).root(exp)
                 return target.floor().add(1)
             },
             buyMax() {
@@ -639,14 +645,14 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             cost() {
                 let x = player.c.buyables[23]
                 let exp = tmp.c.buyables[23].coste
-                return n(100).pow(x.pow(exp)).mul(1e95)
+                return n(1e5).pow(x.pow(exp)).mul('1e720')
             },
             coste() {
-                let exp = 1.4
+                let exp = 1.55
                 return exp
             },
             display() {
-                return "P7+^" + format(this.base()) + "<br>当前:^" + format(this.effect()) + "<br>数量:" + format(player.c.buyables[23]) + "<br>价格:" + format(this.cost()) + "膨胀点数"
+                return "P-B-3+*" + format(this.base()) + "<br>当前:*" + format(this.effect()) + "<br>数量:" + format(player.c.buyables[23]) + "<br>价格:" + format(this.cost()) + "膨胀点数"
             },
             canAfford() { return player.c.dp.gte(this.cost()) && hm("a", 6) },
             buy() {
@@ -654,9 +660,9 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 player.c.dp = player.c.dp.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
-            title() { return "dil-B-5" },
+            title() { return "C-dil-6" },
             base() {
-                let base = player.c.dp.add(10).max(10).log(10).pow(0.01).sub(1)
+                let base = player.c.dp.add(1).max(1).log(10).pow(0.1).mul(0.025)
                 return base
             },
             effect() {
@@ -668,7 +674,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             maxAfford() {
                 let s = player.c.dp
                 let exp = tmp.c.buyables[23].coste
-                let target = s.div(1e95).log(100).root(exp)
+                let target = s.div('1e720').log(1e5).root(exp)
                 return target.floor().add(1)
             },
             buyMax() {
