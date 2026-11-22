@@ -951,7 +951,7 @@ addLayer("e", {
             },
             display() {
                 let a = !tmp.e.buyables[this.id].bonus.eq(0) ? " + " + format(tmp.e.buyables[this.id].bonus) : ''
-                return "PN效果^(" + format(this.base()) + "<sup>x<sup>" + this.base2().toString() + "</sup></sup>+1)<br>当前:^" + format(this.effect()) + "<br>数量:" + format(player.e.buyables[33]) + a + "<br>价格:" + format(this.cost()) + "PN"
+                return "PN效果^(" + format(this.base()) + "<sup>x<sup>" + this.base2().toString() + "</sup></sup>)<br>当前:^" + format(this.effect()) + "<br>数量:" + format(player.e.buyables[33]) + a + "<br>价格:" + format(this.cost()) + "PN"
             },
             canAfford() { return player.e.pn.gte(this.cost()) },
             buy() {
