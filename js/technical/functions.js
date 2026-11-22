@@ -187,6 +187,9 @@ Decimal.prototype.tetraflow = function (start, power) {
 function colorText(elem, color, text) {
     return "<" + elem + " style='color:" + color + ";text-shadow:0px 0px 10px;'>" + text + "</" + elem + ">"
 }
+function layerText(elem, layer, text) {
+    return "<" + elem + " style='color:" + layers[layer].color + ";text-shadow:0px 0px 10px;'>" + text + "</" + elem + ">"
+}
 
 function randomString(length) {
     let result = '';

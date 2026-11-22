@@ -53,12 +53,12 @@ function getStartPlayer() {
 			if (playerdata.infoboxes[layer] == undefined)
 				playerdata.infoboxes[layer] = {};
 			for (item in layers[layer].infoboxes)
-				playerdata.infoboxes[layer][item] = false;
+				playerdata.infoboxes[layer][item] = Object.keys(layers[layer].infoboxes[item])[0];
 		}
 
 	}
 	return playerdata;
-}
+} 
 function getStartLayerData(layer) {
 	layerdata = {};
 	if (layers[layer].startData)
@@ -81,6 +81,7 @@ function getStartLayerData(layer) {
 		layerdata.clickables = getStartClickables(layer);
 	layerdata.spentOnBuyables = decimalZero;
 	layerdata.upgrades = [];
+	layerdata.chargedUpgrades = [];
 	layerdata.milestones = [];
 	layerdata.lastMilestone = null;
 	layerdata.achievements = [];
@@ -199,17 +200,6 @@ function load() {
 		loadOptions();
 	}
 
-	Object.defineProperty(player, 'devSpeed', {
-    get() {
-      layers.T.SpeedCal()
-    },
-    set() {
-      location.reload()
-    },
-    enumerable: true,
-    configurable: false,
-  	})
-
 	if (options.offlineProd) {
 		if (player.offTime === undefined)
 			player.offTime = { remain: 0 };
@@ -272,7 +262,7 @@ function NaNcheck(data) {
 }
 function exportSave() {
 	//if (NaNalert) return
-	let str = btoa(JSON.stringify(player));
+	let str = btoa(unescape((encodeURIComponent(JSON.stringify(player)))));
 
 	const el = document.createElement("textarea");
 	el.value = str;

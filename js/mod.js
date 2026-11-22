@@ -10,11 +10,15 @@ let modInfo = {
 	offlineLimit: 900,  // In second
 }
 let VERSION = {
-	num: "0.2",
-	name: "反转增幅",  
+	num: "0.2.1",
+	name: "无限维度",  
 }
 
 let changelog = `<h1>更新日志:</h1><br>
+	<h3>V0.2.1</h3><br>
+	- 添加了维度<br>
+	- 残局：1e58000点数<br>
+	- 成就数量：18<br>
 	<h3>V0.2</h3><br>
 	- 添加了1个层级<br>
 	- 残局：1e14000点数<br>
@@ -47,22 +51,26 @@ function canGenPoints() {
 
 function getgainexp() {
 	let exp = n(1)
-	exp = exp.mul(tmp.c.dpeff)
+	exp = exp.mul(tmp.c.dilate.pointeff)
+	if (hu("c", 45)) exp = exp.mul(1.022)
+	if (hm('a', 8)) exp = exp.mul(tmp.a.milestones[8].effect)
+	exp = exp.mul(tmp.a.challenges[21].effect)
 	return exp
 }
 
 function getgainmult() {
 	let mult = n(1)
 	mult = mult.mul(tmp.e.effect)
-	mult = mult.mul(tmp.e.pmEff)
+	mult = mult.mul(tmp.e.pm.eff)
 	mult = mult.mul(tmp.c.effect[0])
 	if (hu('p', 11)) mult = mult.mul(tmp.p.upgrades[11].effect)
 	if (hu('p', 14)) mult = mult.mul(tmp.p.upgrades[14].effect)
 	mult = mult.mul(tmp.p.buyables[11].effect)
 	if (hu("p", 12)) mult = mult.mul(2)
 	if (hu("p", 31)) mult = mult.mul(10)
-	if (ha("ach", 33)) mult = mult.mul(tmp.ach.achievements[33].effect)
 	mult = mult.mul(tmp.a.boostereff)
+	if (hu("c", 45)) mult = mult.mul(ue("c", 45))
+	if (ha("ach", 35)) mult = mult.mul(tmp.ach.achievements[35].effect)
 	return mult
 }
 
@@ -76,19 +84,17 @@ function getPointGen() {
 	if (inChallenge('a', 12)) gain = gain.pow(0.5)
 	if (inChallenge("e", 12)) gain = expPow(gain, 0.5)
 	if (getClickableState("c", 11) == 1) gain = expPow(gain, getpointdileff())
+	if (inChallenge('a', 21)) gain = gain.max(0.0183388448578688).addTP(-0.025)
 	//let gainslog = gain.slog(10) ; gainslog = gainslog.min(1.797e308) ; gain = Decimal.tetrate(10, gainslog)
 	return gain
 }
 
 function addedPlayerData() {
-	return {
-		tree: 1
-	}
 }
 
 var displayThings = [
 	function () {
-		let a = "残局:" + format('1e14000') +"点数"
+		let a = "残局:" + format('1e58000') +"点数"
 		/*
 		let tick = 0
     	for (i = 0; i<lastTenTicks.length; i++){
@@ -102,7 +108,7 @@ var displayThings = [
 ]
 
 function isEndgame() {
-	return player.points.gte("1e14000")
+	return player.points.gte("1e58000")
 }
 
 var backgroundStyle = {

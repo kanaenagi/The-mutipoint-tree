@@ -7,6 +7,20 @@ const TMT_VERSION = {
 	tmtName: "Δ"
 }
 
+function getstaticsoftGain(gain, layer, anti = false) {
+	if (anti) {
+		if (layer === 'c') {
+			//gain = gain.anti_softcap(100, 0.8)
+		}
+	}
+	else {
+		if (layer === 'c'){
+			//gain = gain.softcap(100, 0.8)
+		}
+	}
+	return gain
+}
+
 function getResetGain(layer, useType = null) {
 	let type = useType
 	if (!useType) {
@@ -21,6 +35,7 @@ function getResetGain(layer, useType = null) {
 		if ((!tmp[layer].canBuyMax) || tmp[layer].baseAmount.lt(tmp[layer].requires)) return decimalOne
 		let gain = tmp[layer].baseAmount.div(tmp[layer].requires).div(tmp[layer].gainMult).max(1).log(tmp[layer].base).times(tmp[layer].gainExp).pow(Decimal.pow(tmp[layer].exponent, -1))
 		gain = gain.times(tmp[layer].directMult)
+		gain = getstaticsoftGain(gain, layer)
 		return gain.floor().sub(player[layer].points).add(1).max(1);
 	} else if (type == "normal") {
 		if (tmp[layer].baseAmount.lt(tmp[layer].requires)) return decimalZero
@@ -51,7 +66,8 @@ function getNextAt(layer, canMax = false, useType = null) {
 
 	if (type == "static") {
 		if (!tmp[layer].canBuyMax) canMax = false
-		let amt = player[layer].points.plus((canMax && tmp[layer].baseAmount.gte(tmp[layer].nextAt)) ? tmp[layer].resetGain : 0).div(tmp[layer].directMult)
+		let amt = player[layer].points.plus((canMax && tmp[layer].baseAmount.gte(tmp[layer].nextAt)) ? tmp[layer].resetGain : 0)
+		amt = getstaticsoftGain(amt, layer, true).div(tmp[layer].directMult)
 		let extraCost = Decimal.pow(tmp[layer].base, amt.pow(tmp[layer].exponent).div(tmp[layer].gainExp)).times(tmp[layer].gainMult)
 		let cost = extraCost.times(tmp[layer].requires).max(tmp[layer].requires)
 		if (tmp[layer].roundUpCost) cost = cost.ceil()
@@ -330,6 +346,8 @@ function gameLoop(diff) {
 		clearParticles()
 	}
 
+	diff = diff * layers.T.SpeedCal()
+
 	if (maxTickLength) {
 		let limit = maxTickLength()
 		if (diff > limit)
@@ -337,15 +355,13 @@ function gameLoop(diff) {
 	}
 	addTime(diff)
 
-	diff = diff * layers.T.SpeedCal()
-
 	player.points = player.points.add(tmp.pointGen.times(diff)).max(0)
 
 	for (let x = 0; x <= maxRow; x++) {
 		for (item in TREE_LAYERS[x]) {
 			let layer = TREE_LAYERS[x][item]
 			player[layer].resetTime += diff
-			if (tmp[layer].passiveGeneration) generatePoints(layer, diff * tmp[layer].passiveGeneration);
+			if (tmp[layer].passiveGeneration) generatePoints(layer, new Decimal(tmp[layer].passiveGeneration).mul(diff));
 			if (layers[layer].update) layers[layer].update(diff);
 		}
 	}
@@ -354,7 +370,7 @@ function gameLoop(diff) {
 		for (item in OTHER_LAYERS[row]) {
 			let layer = OTHER_LAYERS[row][item]
 			player[layer].resetTime += diff
-			if (tmp[layer].passiveGeneration) generatePoints(layer, diff * tmp[layer].passiveGeneration);
+			if (tmp[layer].passiveGeneration) generatePoints(layer, new Decimal(tmp[layer].passiveGeneration).mul(diff));
 			if (layers[layer].update) layers[layer].update(diff);
 		}
 	}
@@ -413,7 +429,6 @@ var interval = setInterval(function () {
 		}
 		if (!options.offlineProd || player.offTime.remain <= 0) player.offTime = undefined
 	}
-
 	player.time = now
 	if (needCanvasUpdate) {
 		resizeCanvas();

@@ -18,23 +18,26 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             dp: n(0),
             ds: n(0),
             sing: n(0),
-            dliationcount: 0,
+            dpat: false,
+            siat: false,
+            atcu: false,
+            atcp: false,
         }
     },
     requires() {
         let req = n('e600')
         if (hm('a', 0)) req = req.div(1e100)
-        return inChallenge('a', 12)? n(1/0) : req
+        return inChallenge('a', 12) ? n(1 / 0) : req
     },
     color: "#EEEEEE",
     resource: "压缩点数",
     baseResource: "点数",
     doReset(resettingLayer) {
-        let keep = ["dliationcount"]
+        let keep = ['dpat', 'siat', 'atcu', 'atcp']
         if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
     },
-    autoUpgrade() { return player.a.atcu },
-    autoPrestige() { return player.a.atcp },
+    autoUpgrade() { return player.c.atcu && hm('a', 1) },
+    autoPrestige() { return player.c.atcp && hm('a', 1) },
     resetsNothing() { return hm("a", 1) },
     baseAmount() { return player.points },
     row: 2,
@@ -65,6 +68,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
     },
     gainExp() {
         let exp = n(1)
+        if (hm('a', 7)) exp = exp.div(0.9)
         exp = exp.div(tmp.c.buyables[103].effect)
         return exp
     },
@@ -73,43 +77,47 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         mul = mul.mul(tmp.a.buyables[13].effect)
         return mul
     },
-    dpointgain() {
-        if (player.c.dbpoint.lt(1e48)) return n(0)
-        let gain = expPow(player.c.dbpoint.div(1e47).max(1).log(10).pow(3), 1.4)
-        gain = gain.pow(tmp.a.challenges[12].effect)
-        if (hu("p", 43)) gain = gain.mul(ue('p', 43))
-        gain = gain.mul(tmp.c.buyables[11].effect)
-        if (hu('c', 42)) gain = gain.mul(ue('c', 23))
-        if (hu("c", 44)) gain = gain.mul(10)
-        if (hu("c", 51)) gain = gain.mul(tmp.c.upgrades[51].effect)
-        if (hu("e", 55)) gain = gain.mul(1000)
-        if (hm("a", 2)) gain = gain.mul(10)
-        gain = gain.mul(tmp.c.dseff)
-        gain = gain.mul(tmp.c.sing.eff)
-        return gain
+    dilate: {
+        pointgain() {
+            if (player.c.dbpoint.lt(1e48)) return n(0)
+            let gain = expPow(player.c.dbpoint.div(1e47).max(1).log(10).pow(3), 1.4)
+            gain = gain.pow(tmp.a.challenges[12].effect)
+            if (hu("p", 43)) gain = gain.mul(ue('p', 43))
+            if (hu("p", 45)) gain = gain.mul(2)
+            gain = gain.mul(tmp.c.buyables[11].effect)
+            if (hu('c', 42)) gain = gain.mul(ue('c', 23))
+            if (hu("c", 44)) gain = gain.mul(10)
+            if (hu("c", 51)) gain = gain.mul(tmp.c.upgrades[51].effect)
+            if (hu("e", 55)) gain = gain.mul(1000)
+            if (hm("a", 2)) gain = gain.mul(10)
+            gain = gain.mul(tmp.c.dilate.shardeff)
+            gain = gain.mul(tmp.c.sing.eff)
+            return gain
+        },
+        pointeff() {
+            let eff = player.c.dp.add(10).max(10).log(10).pow(0.0115).max(1)
+            if (hu("c", 22)) eff = eff.pow(2)
+            return eff
+        },
+        shardgain() {
+            let gain = player.c.dbpoint.div("1e104").max(1).log(1e20).pow(0.8).softcap(n(100), 1.01, 3)
+            return gain.sub(player.c.ds).floor()
+        },
+        shardnext() {
+            let amt = player.c.ds.add(tmp.c.dilate.shardgain.max(0).add(1)).anti_softcap(n(100), 1.01, 3)
+            let next = Decimal.pow(1e20, amt.root(0.8)).mul("1e104")
+            return next
+        },
+        shardeff() {
+            let amt = player.c.ds
+            if (hu('c', 41)) amt = amt.pow(1.1)
+            let eff = Decimal.pow(100, amt)
+            return eff
+        },
     },
-    dpeff() {
-        let eff = player.c.dp.add(10).max(10).log(10).pow(0.0115).max(1)
-        if (hu("c", 22)) eff = eff.pow(2)
-        return eff
-    },
-    dsgain() {
-        let gain = player.c.dbpoint.div("1e104").max(1).log(1e20).pow(0.8).softcap(n(100), 1.01, 3)
-        return gain.sub(player.c.ds).floor()
-    },
-    dsnext() {
-        let amt = player.c.ds.add(tmp.c.dsgain.max(0).add(1)).anti_softcap(n(100), 1.01, 3)
-        let next = Decimal.pow(1e20, amt.root(0.8)).mul("1e104")
-        return next
-    },
-    dseff() {
-        let amt = player.c.ds
-        if (hu('c', 41)) amt = amt.pow(1.1)
-        let eff = Decimal.pow(100, amt)
-        return eff
-    },
+
     sing: {
-        gain() { 
+        gain() {
             if (player.points.lt('e3250')) return n(0)
             let gain = expPow(player.points.div('1e3250'), 0.75).pow(0.05).softcap(1e14, 0.5)
             let mul = this.mult()
@@ -121,6 +129,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             if (hu("c", 34)) mul = mul.mul(tmp.c.upgrades[34].effect)
             if (hm('a', 0)) mul = mul.mul(10)
             if (hu('a', 11)) mul = mul.mul(tmp.a.upgrades[11].effect)
+            mul = mul.mul(tmp.p.buyables[22].effect)
             return mul
         },
         next() {
@@ -158,8 +167,8 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 "prestige-button",
                 'resource-display',
                 ["blank", "25px"],
-                ["display-text", function () { let a = " (开始于1e48)"; return "点数膨胀的最佳点数为 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.dbpoint) + "</h3> <br><br>你有 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.dp) + "</h3> 膨胀点数 点数^<h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(tmp.c.dpeff) + "</h3><br>你每秒获取" + format(tmp.c.dpointgain) + "膨胀点数" + a }],
-                ["display-text", function () { if (hu("c", 24)) return "你有 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.ds) + "</h3> 膨胀碎片 膨胀点数*<h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(tmp.c.dseff) + "</h3> <br>(下一个在 " + format(tmp.c.dsnext) + " 点数膨胀内点数) " }],
+                ["display-text", function () { let a = " (开始于1e48)"; return "点数膨胀的最佳点数为 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.dbpoint) + "</h3> <br><br>你有 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.dp) + "</h3> 膨胀点数 点数^<h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(tmp.c.dilate.pointeff) + "</h3><br>你每秒获取" + format(tmp.c.dilate.pointgain) + "膨胀点数" + a }],
+                ["display-text", function () { if (hu("c", 24)) return "你有 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.ds) + "</h3> 膨胀碎片 膨胀点数*<h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(tmp.c.dilate.shardeff) + "</h3> <br>(下一个在 " + format(tmp.c.dilate.shardnext) + " 点数膨胀内点数) " }],
                 ["clickables", [1]],
                 ["row", [["buyable", 11], ["buyable", 12], ["buyable", 13]]],
                 ["row", [["buyable", 21], ["buyable", 22], ["buyable", 23]]],
@@ -172,7 +181,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 "prestige-button",
                 'resource-display',
                 ["blank", "25px"],
-                ['display-text', () => "你有 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.sing) + "</h3> 奇点 膨胀点数*<h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>"+ format(tmp.c.sing.eff) + "</h3>"],
+                ['display-text', () => "你有 <h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(player.c.sing) + "</h3> 奇点 膨胀点数*<h3 style='color: #EEEEEE; text-shadow: 0 0 10px #EEEEEE'>" + format(tmp.c.sing.eff) + "</h3>"],
                 ["clickables", [2]],
                 ["row", [["buyable", 101], ["buyable", 102], ["buyable", 103]]],
             ],
@@ -182,10 +191,21 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         if (player.points.gte(player.c.dbpoint) && getClickableState("c", 11) == 1) player.c.dbpoint = player.points
         if (hm("a", 3)) player.c.dbpoint = expPow(player.points, getpointdileff()).max(player.c.dbpoint)
         if (hm("a", 4)) player.c.sing = player.c.sing.add(tmp.c.sing.gain.mul(diff))
-        if (hu("c", 15)) player.c.dp = player.c.dp.add(tmp.c.dpointgain.mul(diff))
-        if (hu("c", 24)) player.c.ds = player.c.ds.add(tmp.c.dsgain).max(player.c.ds)
-        if (player.a.dpat) { layers.c.buyables[11].buyMax(); layers.c.buyables[12].buyMax(); layers.c.buyables[13].buyMax(); layers.c.buyables[21].buyMax(); layers.c.buyables[22].buyMax(); layers.c.buyables[23].buyMax() }
-        if (player.a.siat) { layers.c.buyables[101].buyMax(); layers.c.buyables[102].buyMax(); layers.c.buyables[103].buyMax() }
+        if (hu("c", 15)) player.c.dp = player.c.dp.add(tmp.c.dilate.pointgain.mul(diff))
+        if (hu("c", 24)) player.c.ds = player.c.ds.add(tmp.c.dilate.shardgain).max(player.c.ds)
+        if (player.c.dpat && hm('a', 2)) {
+            layers.c.buyables[11].buyMax()
+            layers.c.buyables[12].buyMax()
+            layers.c.buyables[13].buyMax()
+            layers.c.buyables[21].buyMax()
+            layers.c.buyables[22].buyMax()
+            layers.c.buyables[23].buyMax()
+        }
+        if (player.c.siat && hm('a', 4)) {
+            layers.c.buyables[101].buyMax()
+            layers.c.buyables[102].buyMax()
+            layers.c.buyables[103].buyMax()
+        }
     },
     upgrades: {
         11: {
@@ -193,15 +213,15 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             description: "削弱E-PM-6价格",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("e810"),
+            cost: n("e800"),
             unlocked() { return true },
         },
         12: {
             title: "C2",
-            description: "E7效果变得更好, P3指数^1.1",
+            description: "E7和P3效果变得更好",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("e862"),
+            cost: n("e852"),
             unlocked() { return hu("c", 11) },
         },
         13: {
@@ -215,7 +235,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 return eff
             },
             effectDisplay() { return "*" + format(upgradeEffect('c', 13)) },
-            cost: n("e990"),
+            cost: n("e985"),
             unlocked() { return hu("c", 12) },
         },
         14: {
@@ -228,7 +248,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 return eff
             },
             effectDisplay() { return "^" + format(upgradeEffect('c', 14)) },
-            cost: n("1e1005"),
+            cost: n("1e1004"),
             unlocked() { return hu("c", 13) },
         },
         15: {
@@ -236,7 +256,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             description: "解锁点数膨胀 压缩点数效果也加成声望点数",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("1e1111"),
+            cost: n("1.111e1111"),
             effect() {
                 let eff = Decimal.pow(1e8, player.c.points)
                 return eff
@@ -249,7 +269,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             description: "声望削弱奖励指数^1.25",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("1e1931"),
+            cost: n("1e1905"),
             unlocked() { return hu("c", 15) },
         },
         22: {
@@ -257,15 +277,15 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             description: "膨胀点数效果变得更好",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("1e2440"),
+            cost: n("1e2330"),
             unlocked() { return hu("c", 21) },
         },
         23: {
             title: "C8",
-            description: "膨胀点数加成PN",
+            description: "压缩点数加成PN",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("1e2670"),
+            cost: n("1e2620"),
             effect() {
                 let base = player.c.points.anti_softcap(8, 2, 1)
                 let eff = Decimal.pow(2, base)
@@ -279,7 +299,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             description: "在点数膨胀中解锁膨胀碎片, 获取一个免费的声望力量购买项'P-PP-3'",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("e2810"),
+            cost: n("e2800"),
             unlocked() { return hu("c", 23) },
         },
         25: {
@@ -297,7 +317,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             currencyInternalName: "points",
             effect() { return expPow(player.c.dbpoint.div(1e136).max(10).log(10).pow(2), 1.75) },
             effectDisplay() { return "*" + format(upgradeEffect('c', 31)) },
-            cost: n("1e3435"),
+            cost: n("1e3380"),
             unlocked() { return hu("c", 25) },
         },
         32: {
@@ -305,9 +325,9 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             description: "压缩点数加成奇点",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            effect() { return Decimal.pow(2, player.c.points.sub(12).max(0)) },
+            effect() { return Decimal.pow(2, player.c.points.sub(11)).add(1) },
             effectDisplay() { return "*" + format(upgradeEffect('c', 32)) },
-            cost: n("1e4300"),
+            cost: n("1e4000"),
             unlocked() { return hu("c", 31) },
         },
         33: {
@@ -315,7 +335,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             description: "压缩点数第一效果^2",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("1e5330"),
+            cost: n("1e5280"),
             unlocked() { return hu("c", 32) },
         },
         34: {
@@ -325,7 +345,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             currencyInternalName: "points",
             effect() { return expPow(player.e.points, 0.5).pow(0.1) },
             effectDisplay() { return "*" + format(upgradeEffect('c', 34)) },
-            cost: n("1e5800"),
+            cost: n("1e5760"),
             unlocked() { return hu("c", 33) },
         },
         35: {
@@ -357,23 +377,27 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             description: "削弱E-PM-6价格",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("ee1694"),
-            unlocked() { return hu("c", 420) },
+            cost: n("e16000"),
+            unlocked() { return hu("c", 42) },
         },
         44: {
             title: "C19",
-            description: "膨胀点数*10",
+            description: "压缩点数加成E-PM-3基础效果",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("e1735"),
+            cost: n("e17950"),
+            effect() { return player.c.points.add(20).log(20) },
+            effectDisplay() { return "*" + format(upgradeEffect('c', 44)) },
             unlocked() { return hu("c", 43) },
         },
         45: {
             title: "C20",
-            description: "",
+            description: "点数^1.022 压缩点数再次加成点数",
             currencyDisplayName: "点数",
             currencyInternalName: "points",
-            cost: n("e1808"),
+            cost: n("e22000"),
+            effect() { return Decimal.pow(1e12, player.c.points) },
+            effectDisplay() { return "*" + format(upgradeEffect('c', 45)) },
             unlocked() { return hu("c", 44) },
         },
         51: {
@@ -384,7 +408,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             effect() { return 100 ** player.c.upgrades.filter(n => (n < 60 && n > 50)).length },
             effectDisplay() { return "*" + format(upgradeEffect('c', 51)) },
             cost: n("e1830"),
-            unlocked() { return hu("c", 45) },
+            unlocked() { return hu("c", 450) },
         },
         52: {
             title: "C22",
@@ -404,7 +428,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
         },
         54: {
             title: "C24",
-            description: "声望点数加成'声望P-PP-2'基础效果",
+            description: "声望点数加成'P-PP-2' 基础效果",
             effect() {
                 return player.p.points.add(10).max(10).log(10).log(10).pow(0.125).max(1)
             },
@@ -428,6 +452,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             cost() {
                 let x = player.c.buyables[11]
                 let exp = tmp.c.buyables[11].coste
+                if (x.gte(170)) x.sub(170).mul(2).add(170)
                 return n(10).pow(x.pow(exp)).mul(1e4)
             },
             coste() {
@@ -458,6 +483,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 let s = player.c.dp
                 let exp = tmp.c.buyables[11].coste
                 let target = s.div(1e4).log(10).root(exp)
+                if (target.gte(170)) target.sub(170).div(2).add(170)
                 return target.floor().add(1)
             },
             buyMax() {
@@ -519,7 +545,6 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             coste() {
                 let exp = 1.8
-                if (hu('a', 21)) exp -= 0.3
                 return exp
             },
             display() {
@@ -602,6 +627,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             cost() {
                 let x = player.c.buyables[22]
                 let exp = tmp.c.buyables[22].coste
+                if (x.gte(100)) x = Decimal.pow(1.01, x.sub(100)).mul(100)
                 return n(10000).pow(x.pow(exp)).mul('1e630')
             },
             coste() {
@@ -632,6 +658,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 let s = player.c.dp
                 let exp = tmp.c.buyables[22].coste
                 let target = s.div('1e630').log(10000).root(exp)
+                if (target.gte(100)) target = target.div(100).log(1.01).add(100)
                 return target.floor().add(1)
             },
             buyMax() {
@@ -699,7 +726,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             canAfford() { return player.c.sing.gte(this.cost()) },
             buy() {
-                if (player.c.sing.lt(this.cost())) return 
+                if (player.c.sing.lt(this.cost())) return
                 player.c.sing = player.c.sing.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -742,7 +769,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             },
             canAfford() { return player.c.sing.gte(this.cost()) },
             buy() {
-                if (player.c.sing.lt(this.cost())) return 
+                if (player.c.sing.lt(this.cost())) return
                 player.c.sing = player.c.sing.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -776,11 +803,11 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 return exp
             },
             display() {
-                return "压缩点数价格^(0.95<sup>x<sup>0.8</sup></sup>)<br>当前:^" + format(this.effect()) + "<br>数量:" + format(player.c.buyables[103]) + "<br>价格:" + format(this.cost()) + "奇点"
+                return "压缩点数价格^(0.95<sup>x<sup>0.8</sup></sup>)<br>当前:^" + format(this.effect(), 3, true) + "<br>数量:" + format(player.c.buyables[103]) + "<br>价格:" + format(this.cost()) + "奇点"
             },
             canAfford() { return player.c.sing.gte(this.cost()) },
             buy() {
-                if (player.c.sing.lt(this.cost())) return 
+                if (player.c.sing.lt(this.cost())) return
                 player.c.sing = player.c.sing.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -825,13 +852,12 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
                 player.e.points = n(0)
                 doReset("e", true)
                 player.e.activeChallenge = a
-                player.c.dliationcount += 1
                 if (getClickableState("c", 11) == 0) setClickableState("c", 11, 1)
                 else setClickableState("c", 11, 0)
             },
             style: {
                 'height': '120px', 'width': '180px', 'font-size': '10px', "border-radius": "5%", "border": "4px solid", "border-color": "rgba(0, 0, 0, 0.125)", "background"() {
-                    let color = "#FFFFFF"
+                    let color = "#EEEEEE"
                     return color
                 }
             }
@@ -853,7 +879,7 @@ addLayer("c", {  //喜欢不内置vue的小朋友们叉出去
             style: {
                 'height': '120px', 'width': '180px', 'font-size': '10px', "border-radius": "5%", "border": "4px solid", "border-color": "rgba(0, 0, 0, 0.125)", "background"() {
                     let color = '#bf8f8f'
-                    if (player.points.gte('e3250')) color = '#FFFFFF'
+                    if (player.points.gte('e3250')) color = '#EEEEEE'
                     return color
                 }
             }

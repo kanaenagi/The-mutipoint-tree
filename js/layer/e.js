@@ -9,11 +9,11 @@ addLayer("e", {
             points: n(0),
             total: n(0),
             best: n(0),
-            bxat1: false,
-            p1a1: false,
-            atup: false,
             pm: n(0),
             pn: n(0),
+            pmat: false,
+            pnat: false,
+            ateu: false,
         }
     },
     color: "#1c56b4",
@@ -24,19 +24,20 @@ addLayer("e", {
     baseAmount() { return player.p.pp },
     type: "normal",
     doReset(resettingLayer) {
-        let keep = []
-        if (hm("a", 0)) keep.push("bxat1", "p1a1", "atup")
+        let keep = ['pmat', 'pnat', 'ateu']
         if (hm("a", 2)) keep.push("milestones")
         if (hm("a", 3)) keep.push('challenges')
         if (layers[resettingLayer].row > this.row) {
-        layerDataReset(this.layer, keep)
-        if (hm("a", 0) && !hm("a", 2)) player.e.milestones.push("0", "1", "2", "3")
-        if (hm('a', 1)) player.e.upgrades.push(15)
+            layerDataReset(this.layer, keep)
+            if (hm("a", 0) && !hm("a", 2)) player.e.milestones.push("0", "1", "2", "3")
+            if (hm('a', 1)) player.e.upgrades.push(15)
         }
     },
-    autoUpgrade() { return player.a.ateu },
+    autoUpgrade() { return player.e.ateu && hm('a', 1) },
     exponent() {
         let exp = 0.08
+        if (hu('a', 21)) exp += 0.005
+        if (hm('a', 9)) exp += .015
         return exp
     },
     gainMult() {
@@ -45,7 +46,6 @@ addLayer("e", {
         if (hu("e", 22)) mult = mult.mul(tmp.e.upgrades[22].effect)
         if (hu("e", 24)) mult = mult.mul(tmp.e.upgrades[24].effect)
         if (hm("e", 11)) mult = mult.mul(tmp.e.milestones[11].effect)
-        if (hu("e", 44)) mult = mult.mul(tmp.e.upgrades[44].effect)
         mult = mult.mul(tmp.e.challenges[11].effect)
         mult = mult.mul(tmp.e.buyables[22].effect)
         if (hu("c", 31)) mult = mult.mul(tmp.c.upgrades[31].effect)
@@ -77,79 +77,88 @@ addLayer("e", {
     },
     getResetGain() {
         if (player.p.pp.lt(tmp.e.requires)) return n(0)
-        let gain = player.p.pp.div(tmp.e.requires).max(1).pow(tmp.e.exponent).overflow('1e170', 0.9)
-        .mul(tmp.e.gainMult).pow(tmp.e.gainExp)
-        if (getClickableState("c", 11) == 1 ) return expPow(gain, getpointdileff())
+        let op = 0.9
+        if (hu('a', 21)) op = 0.95
+        let gain = player.p.pp.div(tmp.e.requires).max(1).pow(tmp.e.exponent).overflow('1e170', op)
+            .mul(tmp.e.gainMult).pow(tmp.e.gainExp)
+        if (getClickableState("c", 11) == 1) return expPow(gain, getpointdileff())
         return gain.floor()
     },
     getNextAt() {
-        let next = tmp.e.getResetGain.add(1).root(tmp.e.gainExp).div(tmp.e.gainMult).overflow('1e170', 0.9 ** -1)
-        .root(tmp.e.exponent).mul(tmp.e.requires).max(tmp.e.requires)
+        let op = 0.9
+        if (hu('a', 21)) op = 0.95
+        let next = tmp.e.getResetGain.add(1).root(tmp.e.gainExp).div(tmp.e.gainMult).overflow('1e170', op ** -1)
+            .root(tmp.e.exponent).mul(tmp.e.requires).max(tmp.e.requires)
         if (isNaN(next.mag)) return n(tmp.e.requires)
-        if (getClickableState("c", 11) == 1 ) return expRoot(next, 0.75)
+        if (getClickableState("c", 11) == 1) return expRoot(next, 0.75)
         return next
     },
-    pmGain() {
-        if (!hm("e", 6)) return n(0)
-        let base = tmp.e.buyables[11].effect
-        base = base.mul(tmp.c.buyables[22].effect)
-        let bexp = n(0)
-        if (hm("e", 9)) bexp = bexp.add(3)
-        if (hu("e", 33)) bexp = bexp.add(3)
-        bexp = bexp.add(tmp.e.buyables[13].effect)
-        let mult = n(1)
-        mult = mult.mul(tmp.e.buyables[12].effect)
-        if (hu("c", 13)) mult = mult.mul(tmp.c.upgrades[13].effect)
-        if (hu("e", 21)) mult = mult.mul(tmp.e.upgrades[21].effect)
-        if (hu("e", 35)) mult = mult.mul(tmp.e.upgrades[35].effect)
-        if (hu("p", 31)) mult = mult.mul(tmp.p.upgrades[31].effect)
-        if (hu("p", 41)) mult = mult.mul(tmp.p.upgrades[41].effect)
-        if (hu("p", 52)) mult = mult.mul(tmp.p.upgrades[52].effect)
-        mult = mult.mul(Decimal.pow(base, bexp))
-        mult = mult.mul(tmp.e.pneff[0])
-        let gain = base.mul(mult)
-        return gain
+    pm: {
+        gain() {
+            if (!hm("e", 6)) return n(0)
+            let base = tmp.e.buyables[11].effect
+            base = base.mul(tmp.c.buyables[22].effect)
+            let bexp = n(0)
+            if (hm("e", 9)) bexp = bexp.add(3)
+            if (hu("e", 33)) bexp = bexp.add(3)
+            bexp = bexp.add(tmp.e.buyables[13].effect)
+            let mult = n(1)
+            mult = mult.mul(tmp.e.buyables[12].effect)
+            if (hu("c", 13)) mult = mult.mul(tmp.c.upgrades[13].effect)
+            if (hu("e", 21)) mult = mult.mul(tmp.e.upgrades[21].effect)
+            if (hu("e", 35)) mult = mult.mul(tmp.e.upgrades[35].effect)
+            if (hu("p", 31)) mult = mult.mul(tmp.p.upgrades[31].effect)
+            if (hu("p", 41)) mult = mult.mul(tmp.p.upgrades[41].effect)
+            mult = mult.mul(Decimal.pow(base, bexp))
+            mult = mult.mul(tmp.e.pn.eff[0])
+            let gain = base.mul(mult)
+            return gain
+        },
+        eff() {
+            let exp = n(1)
+            if (hu('p', 32)) exp = exp.mul(tmp.p.upgrades[32].effect)
+            if (hu('e', 32)) exp = exp.mul(1.2)
+            if (hu("c", 14)) exp = exp.mul(tmp.c.upgrades[14].effect)
+            let eff = player.e.pm.add(1).max(1).pow(exp.mul(0.5))
+            return eff.softcap('1e5000', 0.25)
+        },
     },
-    pmEff() {
-        let exp = n(1)
-        if (hu('p', 32)) exp = exp.mul(tmp.p.upgrades[32].effect)
-        if (hu('e', 32)) exp = exp.mul(1.2)
-        if (hu("c", 14)) exp = exp.mul(tmp.c.upgrades[14].effect)
-        let eff = player.e.pm.add(1).max(1).pow(exp.mul(0.5))
-        return eff
+    pn: {
+        gain() {
+            if (player.e.pm.lt(1e211)) return n(0)
+            let base = player.e.pm.div(1e210).log(10)
+            let bexp = n(0)
+            bexp = bexp.add(tmp.e.buyables[32].effect)
+            let mult = n(1)
+            if (hu("p", 45)) mult = mult.mul(2)
+            if (hu("e", 44)) mult = mult.mul(tmp.e.upgrades[44].effect)
+            if (hu("c", 23)) mult = mult.mul(tmp.c.upgrades[23].effect)
+            mult = mult.mul(tmp.e.buyables[31].effect)
+            mult = mult.mul(tmp.c.buyables[101].effect)
+            mult = mult.mul(Decimal.pow(base, bexp))
+            //mult = mult.mul(tmp.c.sing.eff)
+            if (hm('a', 2)) mult = mult.mul(10)
+            if (hu("c", 35)) mult = mult.mul(100)
+            if (hm("a", 3)) mult = mult.mul(tmp.a.milestones[3].effect)
+            let exp = n(1)
+
+            let gain = base.mul(mult).pow(exp)
+            return gain
+        },
+        eff() {
+            let eff = Array(2).fill().map(_ => n(1))
+            eff[0] = player.e.pn.add(1).pow(2)
+            eff[0] = eff[0].pow(tmp.e.buyables[33].effect)
+            eff[1] = player.e.pn.add(10).max(10).log(10).pow(0.4).mul(0.1).add(0.9)
+            return eff
+        },
     },
-    pngain() {
-        if (player.e.pm.lt(1e211)) return n(0)
-        let base = player.e.pm.div(1e210).log(10)
-        let bexp = n(0)
-        bexp = bexp.add(tmp.e.buyables[32].effect)
-        let mult = n(1)
-        if (hu("c", 23)) mult = mult.mul(tmp.c.upgrades[23].effect)
-        mult = mult.mul(tmp.e.buyables[31].effect)
-        mult = mult.mul(tmp.c.buyables[101].effect)
-        mult = mult.mul(Decimal.pow(base, bexp))
-        //mult = mult.mul(tmp.c.sing.eff)
-        if (hm('a', 2)) mult = mult.mul(10)
-        if (hu("c", 35)) mult = mult.mul(100)
-        if (hm("a", 3)) mult = mult.mul(tmp.a.milestones[3].effect)
-        let exp = n(1)
-        
-        let gain = base.mul(mult).pow(exp)
-        return gain
-    },
-    pneff() {
-        let eff = Array.from({ length: 2 }, () => n(1))
-        eff[0] = player.e.pn.add(1).pow(2)
-        eff[0] = eff[0].pow(tmp.e.buyables[33].effect)
-        eff[1] = player.e.pn.add(10).max(10).log(10).pow(0.4).mul(0.1).add(0.9)
-        if (hasChallenge("e", 22)) eff[0] = eff[0].add(player.e.pn.add(10).max(10).log(10).log(10).mul(0.04))
-        return eff
-    },
+
     row: 2, // Row the layer is in on the tree (0 is the first row) [其实1 2 3都可以]
     update(diff) {
-        if (hm("e", 6)) player.e.pm = player.e.pm.add(tmp.e.pmGain.mul(diff))
-        if (hm("e", 10)) player.e.pn = player.e.pn.add(tmp.e.pngain.mul(diff))
-        if (player.a.pmat) {
+        if (hm("e", 6)) player.e.pm = player.e.pm.add(tmp.e.pm.gain.mul(diff))
+        if (hm("e", 10)) player.e.pn = player.e.pn.add(tmp.e.pn.gain.mul(diff))
+        if (player.e.pmat && hm('a', 0)) {
             layers.e.buyables[11].buyMax()
             layers.e.buyables[12].buyMax()
             layers.e.buyables[13].buyMax()
@@ -157,7 +166,7 @@ addLayer("e", {
             layers.e.buyables[22].buyMax()
             layers.e.buyables[23].buyMax()
         }
-        if (player.a.pnat) {
+        if (player.e.pnat && hm('a', 2)) {
             layers.e.buyables[31].buyMax()
             layers.e.buyables[32].buyMax()
             layers.e.buyables[33].buyMax()
@@ -210,7 +219,7 @@ addLayer("e", {
                 "prestige-button",
                 'resource-display',
                 ["blank", "25px"],
-                ["display-text", function () { return "你有 <h3 style='color: #1c56b4; text-shadow: 0 0 10px #1c56b4'>" + format(player.e.pm) + "</h3 > PM 点数*<h3 style='color: #1c56b4; text-shadow: 0 0 10px #1c56b4'>" + format(tmp.e.pmEff) + "<h3><br>你每秒获取" + format(tmp.e.pmGain) + "PM/s" }],
+                ["display-text", function () { return "你有 <h3 style='color: #1c56b4; text-shadow: 0 0 10px #1c56b4'>" + format(player.e.pm) + "</h3 > PM 点数*<h3 style='color: #1c56b4; text-shadow: 0 0 10px #1c56b4'>" + format(tmp.e.pm.eff) + "<h3><br>你每秒获取" + format(tmp.e.pm.gain) + "PM/s" }],
                 ["row", [["buyable", 11], ["buyable", 12], ["buyable", 13]]],
                 ["row", [["buyable", 21], ["buyable", 22], ["buyable", 23]]],
             ],
@@ -221,7 +230,7 @@ addLayer("e", {
                 "prestige-button",
                 'resource-display',
                 ["blank", "25px"],
-                ["display-text", function () { return "你有 <h3 style='color: #1c56b4; text-shadow: 0 0 10px #1c56b4'>" + format(player.e.pn) + "</h3> PN PM*<h3 style='color: #1c56b4; text-shadow: 0 0 10px #1c56b4'>" + format(tmp.e.pneff[0]) + "<h3><br>你每秒获取" + format(tmp.e.pngain) + "PN/s (开始于1e211PM)" }],
+                ["display-text", function () { return "你有 <h3 style='color: #1c56b4; text-shadow: 0 0 10px #1c56b4'>" + format(player.e.pn) + "</h3> PN PM*<h3 style='color: #1c56b4; text-shadow: 0 0 10px #1c56b4'>" + format(tmp.e.pn.eff[0]) + "<h3><br>你每秒获取" + format(tmp.e.pn.gain) + "PN/s (开始于1e211PM)" }],
                 ["row", [["buyable", 31], ["buyable", 32], ["buyable", 33]]],
                 ["row", [["buyable", 41], ["buyable", 42], ["buyable", 43]]],
             ],
@@ -237,24 +246,24 @@ addLayer("e", {
                 return eff
             },
             effectDisplay() { return "*" + format(upgradeEffect('e', 11)) },
-            cost: n(20),
+            cost: n(10),
             unlocked() { return true },
         },
         12: {
             title: "E2",
             description: "'P-PP-2'基础效果+0.05",
-            cost: n(250),
+            cost: n(50),
             unlocked() { return hu("e", 11) },
         },
         13: {
             title: "E3",
-            description: "点数加成声望力量",
+            description: "点数再次加成声望力量",
             effect() {
                 let eff = player.points.max(10).log10().pow(2)
                 return eff
             },
             effectDisplay() { return "*" + format(upgradeEffect('e', 13)) },
-            cost: n(500),
+            cost: n(200),
             unlocked() { return hu("e", 12) },
         },
         14: {
@@ -264,7 +273,7 @@ addLayer("e", {
                 return player.e.points.add(10).max(10).log(10).add(9).log(10).mul(1.1)
             },
             effectDisplay() { return "*" + format(upgradeEffect('e', 14)) },
-            cost: n(100000),
+            cost: n(50000),
             unlocked() { return hu("e", 13) },
         },
         15: {
@@ -277,11 +286,11 @@ addLayer("e", {
             title: "E6",
             description: "声望力量增强PM",
             effect() {
-                let eff = player.p.pp.add(10).log10()
+                let eff = player.p.pp.add(10).log10().mul(2)
                 return eff
             },
             effectDisplay() { return "*" + format(upgradeEffect('e', 21)) },
-            cost: n(1e12),
+            cost: n(2e10),
             unlocked() { return hu("e", 15) },
         },
         22: {
@@ -290,11 +299,11 @@ addLayer("e", {
             effect() {
                 let eff = player.p.buyables[11].add(1)
                 if (hu('c', 12)) eff = eff.pow(eff.log10().mul(0.5).add(0.5))
-                if (player.e.points.gte(1e41) && hm("e", 9)) eff = eff.add(1).pow(1.5)
+                if (hm("e", 9)) eff = eff.add(1).pow(1.5)
                 return eff
             },
             effectDisplay() { return "*" + format(upgradeEffect('e', 22)) },
-            cost: n(1e13),
+            cost: n(5e11),
             unlocked() { return hu("e", 21) },
         },
         23: {
@@ -312,7 +321,7 @@ addLayer("e", {
             description: "增强点数升级加成增强点数",
             effect() { return 2 ** player.e.upgrades.length },
             effectDisplay() { return "*" + format(upgradeEffect('e', 24)) },
-            cost: n(1e40),
+            cost: n(1e36),
             unlocked() { return hu("e", 23) },
         },
         25: {
@@ -324,25 +333,25 @@ addLayer("e", {
         31: {
             title: "E11",
             description: "解锁更多声望点数升级",
-            cost: n(1e59),
+            cost: n(5e58),
             unlocked() { return hu("e", 25) },
         },
         32: {
             title: "E12",
             description: "PM基础效果^1.2",
-            cost: n(1e71),
+            cost: n(5e70),
             unlocked() { return hu("e", 31) },
         },
         33: {
             title: "E13",
             description: "PM基础指数+3",
-            cost: n(1e92),
+            cost: n(2.5e91),
             unlocked() { return hu("e", 32) },
         },
         34: {
             title: "E14",
             description: "E-PM-2,5基础效果^1.1",
-            cost: n(1e107),
+            cost: n(1e106),
             unlocked() { return hu("e", 33) },
         },
         35: {
@@ -370,16 +379,16 @@ addLayer("e", {
         },
         43: {
             title: "E18",
-            description: "'对数领域'奖励指数^1.05",
-            cost: n('ee355'),
-            unlocked() { return hu("e", 420) },
+            description: "'声望削弱'奖励指数^1.2",
+            cost: n('e1155'),
+            unlocked() { return hu("e", 42) },
         },
         44: {
             title: "E19",
-            description: "基于膨胀点数加成增强点数",
-            cost: n(1.5e171),
+            description: "奇点加成PN",
+            cost: n('e1215'),
             effect() {
-                let eff = expPow(player.c.dp, 0.75).pow(0.2).max(1)
+                let eff = player.c.sing.pow(0.075).max(1)
                 return eff
             },
             effectDisplay() { return "*" + format(upgradeEffect('e', 44)) },
@@ -387,15 +396,20 @@ addLayer("e", {
         },
         45: {
             title: "E20",
-            description: "E-PM-1基础效果*1.25",
-            cost: n(5e179),
+            description: "基于增强点数加成E-PM-5基础效果",
+            cost: n("e2140"),
+            effect() {
+                let eff = player.e.points.max(10).log(10).pow(0.1).mul(0.5).add(1).max(1)
+                return eff
+            },
+            effectDisplay() { return "*" + format(upgradeEffect('e', 45)) },
             unlocked() { return hu("e", 44) },
         },
         51: {
             title: "E21",
-            description: "里程碑2效果指数^1.1",
+            description: "增强点数里程碑2效果指数^1.1",
             cost: n(3e186),
-            unlocked() { return hu("e", 45) },
+            unlocked() { return hu("e", 450) },
         },
         52: {
             title: "E22",
@@ -429,13 +443,13 @@ addLayer("e", {
     },
     milestones: {
         0: {
-            requirementDescription: "2 增强点数 (1)",
+            requirementDescription: "1 增强点数 (1)",
             effectDescription: "自动购买P-B-1,2,3",
-            done() { return player.e.points.gte(2) },
-            toggles: [["e", "bxat1"]],
+            done() { return player.e.points.gte(1) },
+            toggles: [["p", "bxat1"]],
         },
         1: {
-            requirementDescription: "3 增强点数 (2)",
+            requirementDescription: "2 增强点数 (2)",
             effect() {
                 let eff = player.p.points.div(0.1).max(10).log(10).pow(0.6)
                 if (hm("e", 8)) eff = expPow(eff.pow(2), 2)
@@ -445,55 +459,55 @@ addLayer("e", {
             effectDescription() {
                 return "声望点数加成声望力量<br>当前:*" + format(tmp.e.milestones[1].effect)
             },
-            done() { return player.e.points.gte(3) },
+            done() { return player.e.points.gte(2) },
         },
         2: {
             requirementDescription: "5 增强点数 (3)",
             effectDescription: "自动购买声望力量购买项 保留P7",
             done() { return player.e.points.gte(5) },
-            toggles: [["e", "p1a1"]],
+            toggles: [["p", "p1a1"]],
         },
         3: {
             requirementDescription: "10 增强点数 (4)",
             effectDescription: "自动购买声望层级升级",
             done() { return player.e.points.gte(10) },
-            toggles: [["e", "atup"]],
+            toggles: [["p", "atup"]],
         },
         4: {
-            requirementDescription: "50 增强点数 (5)",
+            requirementDescription: "25 增强点数 (5)",
             effect: () => expPow(player.e.points.add(1).max(1).pow(0.5), 0.96),
             effectDescription() { return "增强点数加成声望力量<br>当前:*" + format(this.effect()) },
-            done() { return player.e.points.gte(50) },
+            done() { return player.e.points.gte(25) },
         },
         5: {
-            requirementDescription: "10,000 增强点数 (6)",
+            requirementDescription: "5,000 增强点数 (6)",
             effectDescription: "解锁挑战",
-            done() { return player.e.points.gte(10000) }
+            done() { return player.e.points.gte(5000) }
         },
         6: {
-            requirementDescription: "1e10 增强点数 (7)",
+            requirementDescription: "5e9 增强点数 (7)",
             effectDescription: "解锁PM",
-            done() { return player.e.points.gte(1e10) }
+            done() { return player.e.points.gte(5e9) }
         },
         7: {
-            requirementDescription: "5e55 增强点数 (8)",
+            requirementDescription: "1e55 增强点数 (8)",
             effectDescription: "削弱E-PM-1价格",
-            done() { return player.e.points.gte(5e55) }
+            done() { return player.e.points.gte(1e55) }
         },
         8: {
-            requirementDescription: "1e86 增强点数 (9)",
+            requirementDescription: "1e85 增强点数 (9)",
             effectDescription: "里程碑2效果变得更好",
-            done() { return player.e.points.gte(1e86) }
+            done() { return player.e.points.gte(1e85) }
         },
         9: {
-            requirementDescription: "1e131 增强点数 (10)",
-            effectDescription: "PM基础指数+3",
-            done() { return player.e.points.gte(1e131) }
+            requirementDescription: "1e130 增强点数 (10)",
+            effectDescription: "E7效果变得更好 PM基础指数+3",
+            done() { return player.e.points.gte(1e130) }
         },
         10: {
-            requirementDescription: "1e142 增强点数 (11)",
+            requirementDescription: "1e141 增强点数 (11)",
             effectDescription: "解锁PN",
-            done() { return player.e.points.gte(1e142) }
+            done() { return player.e.points.gte(1e141) }
         },
         11: {
             requirementDescription: "1e174 增强点数 (12)",
@@ -534,7 +548,6 @@ addLayer("e", {
             title() { return "E-PM-1" },
             base() {
                 let base = n(1)
-                if (hu("e", 45)) base = base.mul(1.25)
                 if (hu("e", 52)) base = base.mul(1.6)
                 base = base.mul(tmp.e.challenges[21].effect)
                 return base
@@ -637,6 +650,7 @@ addLayer("e", {
             title() { return "E-PM-3" },
             base() {
                 let base = n(0.5)
+                if (hu('c', 44)) base = base.mul(ue('c', 44))
                 return base
             },
             effect() {
@@ -736,6 +750,7 @@ addLayer("e", {
             title() { return "E-PM-5" },
             base() {
                 let base = player.e.pm.add(10).max(10).log(10).pow(0.5)
+                if (hu("e", 45)) base = base.mul(ue('e', 45))
                 if (hu("e", 34)) base = base.pow(1.1)
                 return base
             },
@@ -774,7 +789,8 @@ addLayer("e", {
             },
             cbase() {
                 let base = 100
-                if (hu("c", 11)) base *= 0.1
+                if (hu("c", 11)) base **= 0.5
+                if (hu('c', 43)) base **= 0.8
                 return base
             },
             costbase() {
@@ -935,7 +951,7 @@ addLayer("e", {
             },
             display() {
                 let a = !tmp.e.buyables[this.id].bonus.eq(0) ? " + " + format(tmp.e.buyables[this.id].bonus) : ''
-                return "PN效果^(" + format(this.base()) + "<sup>x<sup>" + this.base2().toString() + "</sup></sup>+1)<br>当前:^" + format(this.effect()) + "<br>数量:" + format(player.e.buyables[33]) +  a + "<br>价格:" + format(this.cost()) + "PN" 
+                return "PN效果^(" + format(this.base()) + "<sup>x<sup>" + this.base2().toString() + "</sup></sup>+1)<br>当前:^" + format(this.effect()) + "<br>数量:" + format(player.e.buyables[33]) + a + "<br>价格:" + format(this.cost()) + "PN"
             },
             canAfford() { return player.e.pn.gte(this.cost()) },
             buy() {
@@ -991,17 +1007,19 @@ addLayer("e", {
                 return c11
             },
             goal() {
-                let gc11 = [n(5e7), n(1e14), n(1e26), n(1e110), n(1e200), n("10^^1.7975e308")]
+                let gc11 = [n(1e7), n(1e17), n(1e25), n(1e105), n(1e195), n('1e10000')]
+                if (challengeCompletions("e", 11) >= gc11.length) return n('10^^1.7975e308')
                 return gc11[challengeCompletions("e", 11)]
             },
             canComplete: function () { return player.p.points.gte(this.goal()) },
             currencyDisplayName: "声望点数",
             rewardDescription: "声望点数加成增强点数",
-            completionLimit: 5,
+            completionLimit: () => hu('a', 24) ? 6 : 5,
             effect() {
                 let c11 = player.p.points.add(10).max(10).log(10).pow(challengeCompletions("e", 11) * 0.4)
+                if (challengeCompletions("e", 11) >= 6) c11 = c11.pow(5 / 3)
                 if (hu("c", 21)) c11 = expPow(c11, 1.25)
-                if (hu("e", 43)) c11 = expPow(c11, 1.05)
+                if (hu("e", 43)) c11 = expPow(c11, 1.2)
                 if (challengeCompletions("e", 11) < 1) return n(1)
                 return c11
             },
@@ -1020,20 +1038,22 @@ addLayer("e", {
                 return c12
             },
             goal() {
-                let gc12 = [n(1e50), n(1e125), n(1e210), n('1e725'), n('1e1090'), n("10^^1.7975e308")]
+                let gc12 = [n(1e52), n(1e115), n(1e280), n('1e725'), n('1e1075'), n('e30200')]
+                if (challengeCompletions("e", 12) >= gc12.length) return n('10^^1.7975e308')
                 return gc12[challengeCompletions("e", 12)]
             },
             canComplete: function () { return player.p.points.gte(this.goal()) },
             currencyDisplayName: "声望点数",
             rewardDescription: "加成声望力量效果",
-            completionLimit: 5,
+            completionLimit: () => hu('a', 24) ? 6 : 5,
             effect() {
+                if (challengeCompletions('e', 12) >= 6) return Decimal.pow(1.1, challengeCompletions('e', 12) / 1.2)
                 let c12 = .04 * challengeCompletions("e", 12) + 1
                 return c12
             },
             rewardDisplay() { return "^" + this.effect().toFixed(3).toString() },
             unlocked() {
-                return player.e.challenges[11] >= 1
+                return hm("e", 5)
             }
         },
         21: {
@@ -1046,26 +1066,27 @@ addLayer("e", {
                 return c21
             },
             goal() {
-                let gc21 = [n("1e320"), n("1e375"), n("1e680"), n("1e1100"), n("e1250"), n("10^^1.7975e308")]
+                let gc21 = [n("1e320"), n("1e375"), n("1e680"), n("1e1100"), n("e1250"), n('e21400')]
+                if (challengeCompletions("e", 21) >= gc21.length) return n('10^^1.7975e308')
                 return gc21[challengeCompletions("e", 21)]
             },
             canComplete: function () { return player.points.gte(this.goal()) },
             currencyDisplayName: "点数",
-            rewardDescription: "加成E-PM-1效果",
-            completionLimit:5,
+            rewardDescription: () => `加成${hm('e', 6) ? 'E-PM-1' : '???'}效果`,
+            completionLimit: () => hu('a', 24) ? 6 : 5,
             effect() {
-                if (challengeCompletions("e", 21) >= 5) return (2 ** (challengeCompletions("e", 21) -4) ) * 10
+                if (challengeCompletions("e", 21) >= 5) return (2 ** (challengeCompletions("e", 21) - 4)) * 10
                 if (challengeCompletions("e", 21) < 1) return 1
                 let c21 = (challengeCompletions("e", 21) ** 2) * .4 + 1
                 return c21
             },
             rewardDisplay() { return "*" + format(this.effect()) },
             unlocked() {
-                return player.e.challenges[12] >= 5
+                return hm("e", 5)
             }
         },
         22: {
-            name: "撕裂膨胀",
+            name: "逆向膨胀",
             challengeDescription: function () {
                 let c22 = "强制进入之前的挑战"
                 if (inChallenge("e", 22)) c22 = c22 + " (挑战中)"
@@ -1075,21 +1096,23 @@ addLayer("e", {
             },
             countsAs: [11, 12, 21],
             goal() {
-                let gc22 = [n('e495'),n('e580'),n('e850'),n('e1000'),n('e1400'),n('10^^1.7975e308')]
+                let gc22 = [n('e490'), n('e575'), n('e800'), n('e1000'), n('e1350'), n('e6200')]
+                if (challengeCompletions("e", 22) >= gc22.length) return n('10^^1.7975e308')
                 return gc22[challengeCompletions('e', 22)]
             },
             canComplete: function () { return player.p.points.gte(this.goal()) },
             currencyDisplayName: "声望点数",
-            rewardDescription: "在第三次完成时解锁反-点数<br>E-PN-2效果变得更好",
-            completionLimit: 5,
+            rewardDescription: () => `在第三次完成时解锁反-点数<br>${hm('e', 10) ? 'E-PN-2' : '???'}效果变得更好`,
+            completionLimit: () => hu('a', 24) ? 6 : 5,
             effect() {
                 let c21 = (challengeCompletions("e", 22))
-                if (challengeCompletions('e', 22) >=3) return ((c21 - 2) * (1/15)) + 1.8 
+                if (challengeCompletions("e", 22) >= 6) return (2 + ((challengeCompletions("e", 22) - 5) * 0.2))
+                if (challengeCompletions('e', 22) >= 3) return ((c21 - 2) * (1 / 15)) + 1.8
                 return c21 * 0.4 + 1
             },
             rewardDisplay() { return "*" + format(this.effect()) },
             unlocked() {
-                return player.e.challenges[21] >= 5
+                return hm("e", 5)
             }
         },
     },

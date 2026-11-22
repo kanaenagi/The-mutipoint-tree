@@ -39,7 +39,7 @@ addLayer("ach", {
         },
         12: {
             name: "百万点数",
-            tooltip: "获取1,000,000点数",
+            tooltip: "获取1,000,000点数<br>奖励:声望点数*2",
             done() {
                 return player.points.gte(1000000)
             },
@@ -53,7 +53,7 @@ addLayer("ach", {
         },
         14: {
             name: "第二行的开始",
-            tooltip: "获取1增强点数",
+            tooltip: "获取1增强点数<br>奖励:声望力量*2",
             done() {
                 return player.e.points.gte(1)
             },
@@ -74,7 +74,7 @@ addLayer("ach", {
         },
         21: {
             name: "压缩层级",
-            tooltip: "获取1压缩点数",
+            tooltip: "获取1压缩点数 <br>奖励:声望力量*5",
             done() {
                 return player.c.points.gte(1)
             },
@@ -87,7 +87,7 @@ addLayer("ach", {
             },
         },
         23: {
-            name: "点数太膨胀了",
+            name: "新机制要来了?",
             tooltip: "获取1e1000点数",
             done() {
                 return player.points.gte('1e1000')
@@ -101,34 +101,48 @@ addLayer("ach", {
             },
         },
         25: {
+            name: "五倍压缩",
+            tooltip: "获取5压缩点数",
+            done() {
+                return player.c.points.gte(5)
+            },
+        },
+        26: {
             name: "并非note",
             tooltip: "解锁PN",
             done() {
                 return hm('e', 10)
             },
         },
-        26: {
+        31: {
+            name: "声望膨胀",
+            tooltip: "获取1e5000声望点数",
+            done() {
+                return player.p.points.gte('1e5000')
+            },
+        },
+        32: {
             name: "奇点, 第二行的结束...?",
             tooltip: "解锁奇点",
             done() {
                 return hu('c', 25)
             },
         },
-        31: {
+        33: {
             name: "无限增强",
             tooltip: "获取1.797e308增强点数",
             done() {
                 return player.e.points.gte('1.797e308')
             },
         },
-        32: {
+        34: {
             name: "二重压缩点数",
             tooltip: "获取16压缩点数",
             done() {
                 return player.c.points.gte(16)
             },
         },
-        33: {
+        35: {
             name: "进入第三行",
             tooltip() { 
                 return "获取1反-点数<br>奖励:点数 声望点数 声望力量基于成就数量加成<br>当前:*"+format(this.effect())
@@ -140,25 +154,46 @@ addLayer("ach", {
                 return player.a.points.gte(1)
             },
         },
-        34: {
+        36: {
             name: "指数推进",
             tooltip: "解锁推进器",
             done() {
                 return hu('a', 15)
             },
         },
-        35: {
+        41: {
             name: "完全挑战 I",
-            tooltip: "完成所有增强点数挑战5次",
+            tooltip: "完成所有增强点数挑战5次<br>奖励:反-点数*2",
             done() {
                 return player.e.challenges[11] >= 5 && player.e.challenges[12] >= 5 && player.e.challenges[21] >= 5 && player.e.challenges[22] >= 5
             },
         },
-        36: {
+        42: {
             name: "'无效'压缩",
             tooltip: "完成10次无效压缩",
             done() {
                 return player.a.chalcount[2].gte(10)
+            },
+        },
+        43: {
+            name: "推进改良",
+            tooltip: "解锁推进器充能",
+            done() {
+                return hu('a', 23)
+            },
+        },
+        44: {
+            name: "维度提升",
+            tooltip: "解锁维度",
+            done() {
+                return hu('a', 25)
+            },
+        },
+        45: {
+            name: "永恒增强",
+            tooltip: "获取1e4000增强点数",
+            done() {
+                return player.e.points.gte('1e4000')
             },
         },
     },

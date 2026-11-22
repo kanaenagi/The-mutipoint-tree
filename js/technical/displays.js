@@ -168,14 +168,14 @@ function updateTabFormat(layer) {
 
 	let tab = player.subtabs[layer]?.mainTabs
 	if (isFunction(layers[layer].tabFormat)) {
-		Vue.set(temp[layer], 'tabFormat', layers[layer].tabFormat())
+		Vue.set(tmp[layer], 'tabFormat', layers[layer].tabFormat())
 	}
 	else if (Array.isArray(layers[layer].tabFormat)) {
-		Vue.set(temp[layer], 'tabFormat', constructTabFormat(layer))
+		Vue.set(tmp[layer], 'tabFormat', constructTabFormat(layer))
 	}
 	else if (isPlainObject(layers[layer].tabFormat)) {
 		if (layers[layer].tabFormat[tab].embedLayer === undefined)
-		Vue.set(temp[layer].tabFormat[tab], 'content', constructTabFormat(layer, tab))
+		Vue.set(tmp[layer].tabFormat[tab], 'content', constructTabFormat(layer, tab))
 	}
 
 	// Check for embedded layer
@@ -192,7 +192,7 @@ function updateTabFormat(layer) {
 			if (tmp[layer].microtabs[family][tab].embedLayer)
 				updateTabFormat(tmp[layer].microtabs[family][tab].embedLayer)
 			else
-				Vue.set(temp[layer].microtabs[family][tab], 'content', constructTabFormat(layer, tab, family))
+				Vue.set(tem[layer].microtabs[family][tab], 'content', constructTabFormat(layer, tab, family))
 		}
 	}
 }

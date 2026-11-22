@@ -1,8 +1,7 @@
 var tmp = {}
-var temp = tmp // Proxy for tmp
 var funcs = {}
 var NaNalert = false;
-
+ 
 // Tmp will not call these
 var activeFunctions = [
 	"startData", "onPrestige", "doReset", "update", "automate",
@@ -52,8 +51,6 @@ function setupTemp() {
     }
 
 	updateWidth()
-
-	temp = tmp
 }
 
 const boolNames = ["unlocked", "deactivated"]
